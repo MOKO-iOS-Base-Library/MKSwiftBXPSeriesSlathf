@@ -229,7 +229,12 @@ class MKSFBXSTriggerStepTwoController: MKSwiftBaseViewController {
                 _ = try await MKSFBXSTriggerParamManager.shared.config()
                 MKSwiftHudManager.shared.hide()
                 self.view.showCentralToast("Success")
-                perform(#selector(self.goback), with: nil, afterDelay: 0.5)
+                Task { [weak self] in
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                    await MainActor.run {
+                        self?.goback()
+                    }
+                }
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription

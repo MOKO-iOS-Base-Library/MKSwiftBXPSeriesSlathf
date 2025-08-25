@@ -159,7 +159,12 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
                     self.textView.text = ""
                     self.textMsg = ""
                     self.maskView.updateCurrentNumber("0")
-                    self.perform(#selector(self.dismissMaskView), with: nil, afterDelay: 2)
+                    Task { [weak self] in
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                        await MainActor.run {
+                            self?.dismissMaskView()
+                        }
+                    }
                     return
                 }
                 
@@ -185,7 +190,12 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
                 DispatchQueue.main.async {
                     self.parseTimer?.cancel()
                     self.topView.resetAllStatus()
-                    self.perform(#selector(self.dismissMaskView), with: nil, afterDelay: 2.0)
+                    Task { [weak self] in
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                        await MainActor.run {
+                            self?.dismissMaskView()
+                        }
+                    }
                 }
             }
             

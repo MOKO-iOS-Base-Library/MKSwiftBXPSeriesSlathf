@@ -75,7 +75,12 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
                     self.topView.resetAllStatus()
                     self.textView.text = self.textMsg
                     self.textView.scrollRangeToVisible(NSRange(location: self.textView.text.count, length: 1))
-                    self.perform(#selector(self.dismissMaskView), with: nil, afterDelay: 2)
+                    Task { [weak self] in
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                        await MainActor.run {
+                            self?.dismissMaskView()
+                        }
+                    }
                 }
             }
             
@@ -289,7 +294,10 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         parseIndex = 0
         
         Task {[weak self] in
-            guard let self = self else { return }
+            guard let self = self else {
+                MKSwiftHudManager.shared.hide()
+                return
+            }
             do {
                 let count = try await MKSFBXSInterface.readHTRecordTotalNumbers()
                 MKSwiftHudManager.shared.hide()
@@ -301,7 +309,12 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
                     self.textView.text = ""
                     self.textMsg = ""
                     self.maskView.updateCurrentNumber("0")
-                    self.perform(#selector(self.dismissMaskView), with: nil, afterDelay: 2)
+                    Task { [weak self] in
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                        await MainActor.run {
+                            self?.dismissMaskView()
+                        }
+                    }
                     return
                 }
                 

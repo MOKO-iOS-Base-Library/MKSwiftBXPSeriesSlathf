@@ -166,7 +166,13 @@ public class MKSFBXSScanController: MKSwiftBaseViewController {
             UserDefaults.standard.set(false, forKey: "mk_bxs_swf_firstInstall")
         }
         
-        perform(#selector(refreshButtonPressed), with: nil, afterDelay: afterTime)
+        Task { [weak self] in
+            let nanoseconds = UInt64(afterTime * 1_000_000_000)
+            try? await Task.sleep(nanoseconds: nanoseconds)
+            await MainActor.run {
+                self?.refreshButtonPressed()
+            }
+        }
     }
     
     private func showAuthorizationAlert() {
