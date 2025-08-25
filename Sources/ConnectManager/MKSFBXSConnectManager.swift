@@ -32,6 +32,13 @@ enum ConError: LocalizedError {
 
 actor MKSFBXSConnectManager {
     
+    var currentPassword: String { password }
+    var requiresPassword: Bool { needPassword }
+    var temperatureHumidityStatus: Int { thStatus }
+    var accelerometerStatus: Int { accStatus }
+    var hallSensorStatus: Bool { hallStatus }
+    var resetByButtonStatus: Bool { resetByButton }
+    
     // MARK: - Properties
     
     /// Current connection password
@@ -51,14 +58,7 @@ actor MKSFBXSConnectManager {
     
     /// 0: No temperature/humidity sensor, 1: SHT30/SHT31, 2: SHT40, 3: STS40 (temp only), 4: SHT43
     private var thStatus: Int = 0
-    
-    func getPassword() -> String { password }
-    func getNeedPassword() -> Bool { needPassword }
-    func getThStatus() -> Int { thStatus }
-    func getAccStatus() -> Int { accStatus }
-    func getHallStatus() -> Bool { hallStatus }
-    func getResetByButton() -> Bool { resetByButton }
-        
+            
     // MARK: - Singleton
     
     static let shared = MKSFBXSConnectManager()
@@ -67,23 +67,27 @@ actor MKSFBXSConnectManager {
     // MARK: - Public Methods
     
     func connectDevice(_ peripheral: CBPeripheral, password: String?) async throws {
-        try await connectAndValidate(peripheral, password: password)
-        
-        async let hallStatus = readHallStatus()
-        async let resetStatus = readResetButtonStatus()
-        async let sensorType = readSensorType()
-        
-        // 3. 更新设备状态
         do {
-            (self.hallStatus, self.resetByButton, self.accStatus, self.thStatus) = try await (
-                hallStatus, resetStatus, sensorType.axis, sensorType.tempHumidity
-            )
+            try await connectAndValidate(peripheral, password: password)
+            
+            self.hallStatus = try await MKSFBXSInterface.readHallSensorStatus()
+            self.resetByButton = try await MKSFBXSInterface.readResetDeviceByButtonStatus()
+            (self.accStatus, self.thStatus) = try await readSensorType()
         } catch {
             // 如果任何读取失败，断开连接并重新抛出错误
             await MKSwiftBXPSCentralManager.shared.disconnect()
             throw error
         }
-     }
+    }
+    
+    func reset() {
+        password = ""
+        needPassword = false
+        hallStatus = false
+        resetByButton = false
+        accStatus = 0
+        thStatus = 0
+    }
     
     private func connectAndValidate(_ peripheral: CBPeripheral, password: String?) async throws {
         if let psd = password {
@@ -105,22 +109,6 @@ actor MKSFBXSConnectManager {
         } catch {
             await MKSwiftBXPSCentralManager.shared.disconnect()
             throw ConError.connectionFailed
-        }
-    }
-    
-    private func readHallStatus() async throws ->Bool {
-        do {
-            return try await MKSFBXSInterface.readHallSensorStatus()
-        } catch {
-            throw error
-        }
-    }
-    
-    private func readResetButtonStatus() async throws ->Bool {
-        do {
-            return try await MKSFBXSInterface.readResetDeviceByButtonStatus()
-        } catch {
-            throw error
         }
     }
     

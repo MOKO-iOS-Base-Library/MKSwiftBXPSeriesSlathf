@@ -243,7 +243,8 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.deleteBXPRecordHTDatas()
                 MKSwiftHudManager.shared.hide()
@@ -252,22 +253,23 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
     
     private func readDeviceRunTimes() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.readDeviceRuntime()
                 MKSwiftHudManager.shared.hide()
                 
                 let current = Date().timeIntervalSince1970
-                runDate = Date(timeIntervalSince1970: current - Double(result)!)
+                self.runDate = Date(timeIntervalSince1970: current - Double(result)!)
                 
-                loadSubViews()
+                self.loadSubViews()
                 NotificationCenter.default.addObserver(self,
                                                        selector: #selector(self.receiveRecordHTData(_:)),
                                                        name: .mk_bxs_swf_receiveRecordHTData,
@@ -275,7 +277,7 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -286,7 +288,8 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         totalCount = 0
         parseIndex = 0
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let count = try await MKSFBXSInterface.readHTRecordTotalNumbers()
                 MKSwiftHudManager.shared.hide()
@@ -308,7 +311,7 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
             }catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -558,15 +561,16 @@ extension MKSFBXSExportHTDataController: @preconcurrency MKSFBXSExportDataHeader
     
     func mk_bxs_swf_exportButtonPressed() {
         MKSwiftHudManager.shared.showHUD(with: "Waiting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await MKSFBXSExcelManager.exportExcel(withTHDataList: dataList)
+                try await MKSFBXSExcelManager.exportExcel(withTHDataList: self.dataList)
                 MKSwiftHudManager.shared.hide()
                 self.sharedExcel()
             }catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

@@ -31,15 +31,16 @@ class MKSFBXSTHSensorController: MKSwiftBaseViewController {
     
     override func rightButtonMethod() {
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await dataModel.config()
+                try await self.dataModel.config()
                 MKSwiftHudManager.shared.hide()
-                view.showCentralToast("Success")
+                self.view.showCentralToast("Success")
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -57,7 +58,8 @@ class MKSFBXSTHSensorController: MKSwiftBaseViewController {
     //MARK: - Interface
     private func syncTime() {
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let date = Date()
                 let dateFormatter = DateFormatter()
@@ -65,14 +67,14 @@ class MKSFBXSTHSensorController: MKSwiftBaseViewController {
                 let timestamp = dateFormatter.string(from: date)
                 _ = try await MKSFBXSInterface.configDeviceTime(timestamp: UInt(date.timeIntervalSince1970))
                 MKSwiftHudManager.shared.hide()
-                let cellModel = section2List[0]
+                let cellModel = self.section2List[0]
                 cellModel.date = timestamp
-                dataModel.deviceTime = timestamp
-                tableView.reloadData()
+                self.dataModel.deviceTime = timestamp
+                self.tableView.reloadData()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -81,21 +83,22 @@ class MKSFBXSTHSensorController: MKSwiftBaseViewController {
     
     private func readDataFromDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await dataModel.read()
+                try await self.dataModel.read()
                 MKSwiftHudManager.shared.hide()
-                headerViewModel.interval = dataModel.samplingInterval
-                loadSectionDatas()
+                self.headerViewModel.interval = self.dataModel.samplingInterval
+                self.loadSectionDatas()
                 NotificationCenter.default.addObserver(self,
-                                                     selector: #selector(receiveHTData(_:)),
+                                                       selector: #selector(self.receiveHTData(_:)),
                                                      name: NSNotification.Name("mk_bxs_swf_receiveHTDataNotification"),
                                                      object: nil)
                 _ = MKSwiftBXPSCentralManager.shared.notifyTHSensorData(true)
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

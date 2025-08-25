@@ -25,31 +25,33 @@ class MKSFBXSHallSensorConfigController: MKSwiftBaseViewController {
     //MARK: - Private Method
     private func clearTriggerCount() {
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 _ = try await MKSFBXSInterface.clearHallTriggerCount()
                 MKSwiftHudManager.shared.hide()
-                readDataFromDevice()
+                self.readDataFromDevice()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
     
     private func readDataFromDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await dataModel.read()
+                try await self.dataModel.read()
                 MKSwiftHudManager.shared.hide()
-                headerViewModel.count = dataModel.count
-                headerView.dataModel = headerViewModel
+                self.headerViewModel.count = self.dataModel.count
+                self.headerView.dataModel = self.headerViewModel
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

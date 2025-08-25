@@ -63,22 +63,23 @@ class MKSFBXSSettingController: MKSwiftBaseViewController {
     private func readDatas() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
         let dataModel = self.dataModel
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                password = await MKSFBXSConnectManager.shared.getPassword()
-                needPassword = await MKSFBXSConnectManager.shared.getNeedPassword()
+                self.password = await MKSFBXSConnectManager.shared.currentPassword
+                self.needPassword = await MKSFBXSConnectManager.shared.requiresPassword
                 try await dataModel.read()
                 MKSwiftHudManager.shared.hide()
-                loadSection0Datas()
-                loadSection1Datas()
-                loadSection2Datas()
-                loadSection3Datas()
-                loadSection4Datas()
-                tableView.reloadData()
+                self.loadSection0Datas()
+                self.loadSection1Datas()
+                self.loadSection2Datas()
+                self.loadSection3Datas()
+                self.loadSection4Datas()
+                self.tableView.reloadData()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -218,14 +219,15 @@ class MKSFBXSSettingController: MKSwiftBaseViewController {
             return
         }
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 _ = try await MKSFBXSInterface.configConnectPassword(password: passwordAsciiStr)
                 MKSwiftHudManager.shared.hide()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -248,14 +250,15 @@ class MKSFBXSSettingController: MKSwiftBaseViewController {
     
     private func sendResetCommandToDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 _ = try await MKSFBXSInterface.factoryReset()
                 MKSwiftHudManager.shared.hide()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -288,14 +291,15 @@ class MKSFBXSSettingController: MKSwiftBaseViewController {
     
     private func sendResetBatteryCommandToDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 _ = try await MKSFBXSInterface.batteryReset()
                 MKSwiftHudManager.shared.hide()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -305,16 +309,17 @@ class MKSFBXSSettingController: MKSwiftBaseViewController {
         let tempMode: MKSFBXSBatteryADVMode = (mode == 0) ? .voltage : .percentage
         
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 _ = try await MKSFBXSInterface.configBatteryADVMode(mode: tempMode)
                 MKSwiftHudManager.shared.hide()
-                section4List[0].dataListIndex = mode
-                dataModel.batteryAdvMode = mode
+                self.section4List[0].dataListIndex = mode
+                self.dataModel.batteryAdvMode = mode
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -329,17 +334,18 @@ class MKSFBXSSettingController: MKSwiftBaseViewController {
         }
         
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 _ = try await MKSFBXSInterface.configADVChannel(channel: channelValue)
                 MKSwiftHudManager.shared.hide()
-                section4List[1].dataListIndex = channel
-                dataModel.advChannel = channel
+                self.section4List[1].dataListIndex = channel
+                self.dataModel.advChannel = channel
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
-                tableView.mk_reloadRow(1, inSection: 4, with: .none)
+                self.view.showCentralToast(errorMessage)
+                self.tableView.mk_reloadRow(1, inSection: 4, with: .none)
             }
         }
     }

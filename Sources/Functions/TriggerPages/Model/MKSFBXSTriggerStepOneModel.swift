@@ -97,10 +97,10 @@ class MKSFBXSTriggerStepOneModel {
     func loadTriggerTypeList() async {
         let manager = MKSFBXSConnectManager.shared
         
-        let thStatus = await manager.getThStatus()
-        let accStatus = await manager.getAccStatus()
-        let hallStatus = await manager.getHallStatus()
-        let resetByButton = await manager.getResetByButton()
+        let thStatus = await manager.temperatureHumidityStatus
+        let accStatus = await manager.accelerometerStatus
+        let hallStatus = await manager.hallSensorStatus
+        let resetByButton = await manager.resetByButtonStatus
         
         if thStatus > 0 {
             var temperatureModel = MKSFBXSTriggerTypeModel()
@@ -190,10 +190,10 @@ class MKSFBXSTriggerStepOneModel {
         
         let manager = MKSFBXSConnectManager.shared
         
-        let thStatus = await manager.getThStatus()
-        let accStatus = await manager.getAccStatus()
-        let hallStatus = await manager.getHallStatus()
-        let resetByButton = await manager.getResetByButton()
+        let thStatus = await manager.temperatureHumidityStatus
+        let accStatus = await manager.accelerometerStatus
+        let hallStatus = await manager.hallSensorStatus
+        let resetByButton = await manager.resetByButtonStatus
             
         trigger = Int(result["triggerType"] as! String)! > 0
             

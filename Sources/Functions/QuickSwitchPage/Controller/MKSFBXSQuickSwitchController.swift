@@ -30,15 +30,16 @@ class MKSFBXSQuickSwitchController: MKSwiftBaseViewController {
     
     private func readDataFromDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await dataModel.read()
+                try await self.dataModel.read()
                 MKSwiftHudManager.shared.hide()
-                loadSectionData()
+                self.loadSectionData()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -104,46 +105,48 @@ class MKSFBXSQuickSwitchController: MKSwiftBaseViewController {
     
     private func setConnectStatusToDevice(_ connect: Bool) {
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.configConnectable(connectable: connect)
                 MKSwiftHudManager.shared.hide()
                 if !result {
-                    view.showCentralToast("Config failed")
-                    collectionView.reloadData()
+                    self.view.showCentralToast("Config failed")
+                    self.collectionView.reloadData()
                     return
                 }
-                view.showCentralToast("Success!")
-                dataModel.connectable = connect
-                let cellModel = dataList[0]
+                self.view.showCentralToast("Success!")
+                self.dataModel.connectable = connect
+                let cellModel = self.dataList[0]
                 cellModel.isOn = connect
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
     
     private func configTriggerLEDIndicator(_ isOn: Bool) {
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.configTriggerLEDIndicatorStatus(isOn: isOn)
                 MKSwiftHudManager.shared.hide()
                 if !result {
-                    view.showCentralToast("Config failed")
-                    collectionView.reloadData()
+                    self.view.showCentralToast("Config failed")
+                    self.collectionView.reloadData()
                     return
                 }
-                view.showCentralToast("Success!")
-                dataModel.trigger = isOn
-                let cellModel = dataList[1]
+                self.view.showCentralToast("Success!")
+                self.dataModel.trigger = isOn
+                let cellModel = self.dataList[1]
                 cellModel.isOn = isOn
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                selfview.showCentralToast(errorMessage)
             }
         }
     }
@@ -171,46 +174,48 @@ class MKSFBXSQuickSwitchController: MKSwiftBaseViewController {
     private func commandForPasswordVerification(_ isOn: Bool) {
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.configPasswordVerification(isOn: isOn)
                 MKSwiftHudManager.shared.hide()
                 if !result {
-                    view.showCentralToast("Config failed")
-                    collectionView.reloadData()
+                    self.view.showCentralToast("Config failed")
+                    self.collectionView.reloadData()
                     return
                 }
-                view.showCentralToast("Success!")
-                dataModel.passwordVerification = isOn
-                let cellModel = dataList[2]
+                self.view.showCentralToast("Success!")
+                self.dataModel.passwordVerification = isOn
+                let cellModel = self.dataList[2]
                 cellModel.isOn = isOn
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
     
     private func configTagIDAutofill(_ isOn: Bool) {
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.configTagIDAutofillStatus(isOn: isOn)
                 MKSwiftHudManager.shared.hide()
                 if !result {
-                    view.showCentralToast("Config failed")
-                    collectionView.reloadData()
+                    self.view.showCentralToast("Config failed")
+                    self.collectionView.reloadData()
                     return
                 }
                 view.showCentralToast("Success!")
-                dataModel.autoFill = isOn
-                let cellModel = dataList[3]
+                self.dataModel.autoFill = isOn
+                let cellModel = self.dataList[3]
                 cellModel.isOn = isOn
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -237,23 +242,24 @@ class MKSFBXSQuickSwitchController: MKSwiftBaseViewController {
     
     private func commandResetByButton(_ isOn: Bool) {
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.configResetDeviceByButtonStatus(isOn: isOn)
                 MKSwiftHudManager.shared.hide()
                 if !result {
-                    view.showCentralToast("Config failed")
-                    collectionView.reloadData()
+                    self.view.showCentralToast("Config failed")
+                    self.collectionView.reloadData()
                     return
                 }
                 view.showCentralToast("Success!")
-                dataModel.resetByButton = isOn
-                let cellModel = dataList[4]
+                self.dataModel.resetByButton = isOn
+                let cellModel = self.dataList[4]
                 cellModel.isOn = isOn
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -280,23 +286,24 @@ class MKSFBXSQuickSwitchController: MKSwiftBaseViewController {
     
     private func commandTurnOffByButton(_ isOn: Bool) {
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.configHallSensorStatus(isOn: isOn)
                 MKSwiftHudManager.shared.hide()
                 if !result {
-                    view.showCentralToast("Config failed")
-                    collectionView.reloadData()
+                    self.view.showCentralToast("Config failed")
+                    self.collectionView.reloadData()
                     return
                 }
-                view.showCentralToast("Success!")
-                dataModel.turnOffByButton = isOn
-                let cellModel = dataList[5]
+                self.view.showCentralToast("Success!")
+                self.dataModel.turnOffByButton = isOn
+                let cellModel = self.dataList[5]
                 cellModel.isOn = isOn
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

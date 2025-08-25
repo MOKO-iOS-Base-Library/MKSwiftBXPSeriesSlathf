@@ -37,15 +37,16 @@ class MKSFBXSSlotController: MKSwiftBaseViewController {
     private func readDatasFromDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
         let dataModel = self.dataModel
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 try await dataModel.read()
                 MKSwiftHudManager.shared.hide()
-                updateCellModels()
+                self.updateCellModels()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -125,7 +126,8 @@ extension MKSFBXSSlotController: UITableViewDelegate, UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true)
         
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.readSlotTriggerData(index: indexPath.row)
                 MKSwiftHudManager.shared.hide()
@@ -135,10 +137,10 @@ extension MKSFBXSSlotController: UITableViewDelegate, UITableViewDataSource {
                 }
                 
                 let connectManager = MKSFBXSConnectManager.shared
-                let accStatus = await connectManager.getAccStatus()
-                let thStatus = await connectManager.getThStatus()
-                let resetByButton = await connectManager.getResetByButton()
-                let hallStatus = await connectManager.getHallStatus()
+                let accStatus = await connectManager.accelerometerStatus
+                let thStatus = await connectManager.temperatureHumidityStatus
+                let resetByButton = await connectManager.resetByButtonStatus
+                let hallStatus = await connectManager.hallSensorStatus
                 let trigger = (triggerType != "00")
                 if trigger {
                     // Trigger enabled
@@ -146,22 +148,22 @@ extension MKSFBXSSlotController: UITableViewDelegate, UITableViewDataSource {
                     if accStatus == 0 &&
                        thStatus == 0 &&
                        (resetByButton || hallStatus) {
-                        view.showCentralToast("Current device doesn't has sensor!")
+                        self.view.showCentralToast("Current device doesn't has sensor!")
                         return
                     }
                     
                     let vc = MKSFBXSTriggerStepOneController()
                     vc.slotIndex = indexPath.row
-                    navigationController?.pushViewController(vc, animated: true)
+                    self.navigationController?.pushViewController(vc, animated: true)
                 } else {
                     let vc = MKSFBXSSlotConfigController()
                     vc.slotIndex = indexPath.row
-                    navigationController?.pushViewController(vc, animated: true)
+                    self.navigationController?.pushViewController(vc, animated: true)
                 }
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

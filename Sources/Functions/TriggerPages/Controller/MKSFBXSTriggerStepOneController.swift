@@ -55,16 +55,17 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
         if nextButton.titleLabel?.text == "Done" {
             // Close trigger
             MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
-            Task {
+            Task {[weak self] in
+                guard let self = self else { return }
                 do {
                     _ = try await MKSFBXSTriggerParamManager.shared.config()
                     MKSwiftHudManager.shared.hide()
-                    view.showCentralToast("Success")
-                    perform(#selector(goback), with: nil, afterDelay: 0.5)
+                    self.view.showCentralToast("Success")
+                    perform(#selector(self.goback), with: nil, afterDelay: 0.5)
                 } catch {
                     let errorMessage = error.localizedDescription
                     MKSwiftHudManager.shared.hide()
-                    view.showCentralToast(errorMessage)
+                    self.view.showCentralToast(errorMessage)
                 }
             }
             return
@@ -90,18 +91,19 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
     
     private func readDataFromDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 await MKSFBXSTriggerParamManager.shared.stepOneModel.loadTriggerTypeList()
                 _ = try await MKSFBXSTriggerParamManager.shared.read()
                 MKSwiftHudManager.shared.hide()
-                loadSectionDatas()
+                self.loadSectionDatas()
                 let nextTitle = MKSFBXSTriggerParamManager.shared.stepOneModel.trigger ? "Next" : "Done"
-                nextButton.setTitle(nextTitle, for: .normal)
+                self.nextButton.setTitle(nextTitle, for: .normal)
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

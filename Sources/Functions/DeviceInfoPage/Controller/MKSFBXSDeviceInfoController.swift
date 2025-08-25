@@ -27,15 +27,16 @@ class MKSFBXSDeviceInfoController: MKSwiftBaseViewController {
     private func readDatasFromDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
         let dataModel = self.dataModel
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 try await dataModel.read()
                 MKSwiftHudManager.shared.hide()
-                loadSectionDatas()
+                self.loadSectionDatas()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

@@ -118,44 +118,45 @@ class MKSFBXSDFUModule {
     
     @MainActor private func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic) {
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 if characteristic.isEqual(MKSwiftBXPSCentralManager.shared.otaContralCharacteristic()) {
-                    if otaProcess == .reconnect {
+                    if self.otaProcess == .reconnect {
                         if MKSwiftBXPSCentralManager.shared.otaDataCharacteristic() != nil {
                             //当前设备不需要重连
                             NotificationCenter.default.addObserver(
                                 self,
-                                selector: #selector(deviceConnectTypeChanged),
+                                selector: #selector(self.deviceConnectTypeChanged),
                                 name: .mk_bxs_swf_peripheralConnectStateChanged,
                                 object: nil
                             )
-                            writeFileData(toCharacteristic: characteristic)
+                            self.writeFileData(toCharacteristic: characteristic)
                             return
                         }
-                        try await reconnectDevice()
+                        try await self.reconnectDevice()
                         return
                     }
                     //设备刚进入dfu模式，重连接之后的操作。刚发送完00，设备启动dfu
-                    if otaProcess == .updating {
-                        writeFileData(toCharacteristic: MKSwiftBXPSCentralManager.shared.otaDataCharacteristic()!)
+                    if self.otaProcess == .updating {
+                        self.writeFileData(toCharacteristic: MKSwiftBXPSCentralManager.shared.otaDataCharacteristic()!)
                         return
                     }
-                    if otaProcess == .complete {
-                        dfuContinuation?.resume()
+                    if self.otaProcess == .complete {
+                        self.dfuContinuation?.resume()
                     }
                     return
                 }
                 if characteristic.isEqual(MKSwiftBXPSCentralManager.shared.otaDataCharacteristic()) {
-                    if location < fileData!.count {
+                    if self.location < self.fileData!.count {
                         print("发送中")
-                        writeFileData(toCharacteristic: characteristic)
+                        self.writeFileData(toCharacteristic: characteristic)
                         return
                     }
                     //需要发送结束标志
                     print("发送最后一帧升级数据")
-                    otaProcess = .complete
-                    writeSingleByteValue(kBXTTerminateFimwareUpdateData,
+                    self.otaProcess = .complete
+                    self.writeSingleByteValue(kBXTTerminateFimwareUpdateData,
                                          toCharacteristic: MKSwiftBXPSCentralManager.shared.otaContralCharacteristic()!)
                     return
                 }

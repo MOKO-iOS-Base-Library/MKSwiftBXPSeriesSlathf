@@ -224,15 +224,16 @@ extension MKSFBXSFilterTempHistoryDataController: @preconcurrency MKSFBXSFilterT
     
     func bxs_swf_filterHTHistoryHeaderView_exportButtonPressed() {
         MKSwiftHudManager.shared.showHUD(with: "Waiting...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await MKSFBXSExcelManager.exportExcel(withTHDataList: dataList)
+                try await MKSFBXSExcelManager.exportExcel(withTHDataList: self.dataList)
                 MKSwiftHudManager.shared.hide()
-                sharedExcel()
+                self.sharedExcel()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

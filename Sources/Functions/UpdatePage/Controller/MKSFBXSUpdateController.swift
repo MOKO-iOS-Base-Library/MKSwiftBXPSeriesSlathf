@@ -167,19 +167,20 @@ extension MKSFBXSUpdateController: UITableViewDelegate, UITableViewDataSource {
         let filePath = document + "/" + firmwareModel.leftMsg
         leftButton.isEnabled = false
         
-        Task {
+        MKSwiftHudManager.shared.showHUD(with: "Waiting...", in: view, isPenetration: false)
+        
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                MKSwiftHudManager.shared.showHUD(with: "Waiting...", in: view, isPenetration: false)
-                
-                try await dfuModule.update(withFileUrl: filePath)
-                MKSwiftHudManager.shared.showHUD(with: "Update firmware successfully!", in: view, isPenetration: false)
+                try await self.dfuModule.update(withFileUrl: filePath)
+                MKSwiftHudManager.shared.showHUD(with: "Update firmware successfully!", in: self.view, isPenetration: false)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
                     self?.updateComplete()
                 }
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

@@ -28,21 +28,22 @@ class MKSFBXSSensorConfigController: MKSwiftBaseViewController {
     
     // MARK: - Data Loading
     private func loadSectionDatas() {
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let manager = MKSFBXSConnectManager.shared
                 
-                let thStatus = await manager.getThStatus()
-                let accStatus = await manager.getAccStatus()
-                let hallStatus = await manager.getHallStatus()
-                let resetByButton = await manager.getResetByButton()
+                let thStatus = await manager.temperatureHumidityStatus
+                let accStatus = await manager.accelerometerStatus
+                let hallStatus = await manager.hallSensorStatus
+                let resetByButton = await manager.resetByButtonStatus
                 
                 if accStatus > 0 {
                     let cellModel1 = MKSwiftNormalTextCellModel()
                     cellModel1.leftMsg = "3-axis accelerometer"
                     cellModel1.showRightIcon = true
                     cellModel1.methodName = "pushAxisSensor"
-                    dataList.append(cellModel1)
+                    self.dataList.append(cellModel1)
                 }
                 
                 if !hallStatus && !resetByButton {
@@ -50,7 +51,7 @@ class MKSFBXSSensorConfigController: MKSwiftBaseViewController {
                     cellModel2.leftMsg = "Hall sensor"
                     cellModel2.showRightIcon = true
                     cellModel2.methodName = "pushHallSensor"
-                    dataList.append(cellModel2)
+                    self.dataList.append(cellModel2)
                 }
                 
                 if thStatus == 1 || thStatus == 2 || thStatus == 4 {
@@ -58,7 +59,7 @@ class MKSFBXSSensorConfigController: MKSwiftBaseViewController {
                     cellModel3.leftMsg = "Temperature & Humidity"
                     cellModel3.showRightIcon = true
                     cellModel3.methodName = "pushTHSensor"
-                    dataList.append(cellModel3)
+                    self.dataList.append(cellModel3)
                 }
                 
                 if thStatus == 3 {
@@ -66,10 +67,10 @@ class MKSFBXSSensorConfigController: MKSwiftBaseViewController {
                     cellModel4.leftMsg = "Temperature"
                     cellModel4.showRightIcon = true
                     cellModel4.methodName = "pushTemperatureSensor"
-                    dataList.append(cellModel4)
+                    self.dataList.append(cellModel4)
                 }
                 
-                tableView.reloadData()
+                self.tableView.reloadData()
             }
         }
     }

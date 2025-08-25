@@ -38,15 +38,16 @@ class MKSFBXSRemoteReminderController: MKSwiftBaseViewController {
     private func readDatasFromDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await dataModel.read()
+                try await self.dataModel.read()
                 MKSwiftHudManager.shared.hide()
-                loadSectionDatas()
+                self.loadSectionDatas()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -67,15 +68,16 @@ class MKSFBXSRemoteReminderController: MKSwiftBaseViewController {
         }
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 _ = try await MKSFBXSInterface.configRemoteReminderLEDNotiParams(blinkingTime: time, blinkingInterval: interval)
                 MKSwiftHudManager.shared.hide()
-                view.showCentralToast("Success")
+                self.view.showCentralToast("Success")
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -97,15 +99,16 @@ class MKSFBXSRemoteReminderController: MKSwiftBaseViewController {
         
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await dataModel.config()
+                try await self.dataModel.config()
                 MKSwiftHudManager.shared.hide()
-                view.showCentralToast("Success")
+                self.view.showCentralToast("Success")
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

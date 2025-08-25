@@ -223,16 +223,17 @@ class MKSFBXSTriggerStepTwoController: MKSwiftBaseViewController {
     func saveDataToDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
         //第一个页面读取全部数据，包含了第二个和第三个页面的数据
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 _ = try await MKSFBXSTriggerParamManager.shared.config()
                 MKSwiftHudManager.shared.hide()
-                view.showCentralToast("Success")
-                perform(#selector(goback), with: nil, afterDelay: 0.5)
+                self.view.showCentralToast("Success")
+                perform(#selector(self.goback), with: nil, afterDelay: 0.5)
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

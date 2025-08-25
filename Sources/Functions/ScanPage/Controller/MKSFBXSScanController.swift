@@ -288,7 +288,8 @@ public class MKSFBXSScanController: MKSwiftBaseViewController {
         
         let confirmAction = MKSwiftAlertViewAction(title: "OK") {
             Task { [weak self] in
-                await self!.startConnectPeripheral(peripheral, needPassword: true)
+                guard let self = self else { return }
+                await self.startConnectPeripheral(peripheral, needPassword: true)
             }
         }
         
@@ -316,7 +317,7 @@ public class MKSFBXSScanController: MKSwiftBaseViewController {
                 
                 do {
                     // 显示加载
-                    MKSwiftHudManager.shared.showHUD(with: "Connecting...", in: view, isPenetration: false)
+                    MKSwiftHudManager.shared.showHUD(with: "Connecting...", in: self.view, isPenetration: false)
                     // 连接设备
                     try await MKSFBXSConnectManager.shared.connectDevice(
                         peripheral,
@@ -328,13 +329,13 @@ public class MKSFBXSScanController: MKSwiftBaseViewController {
                     }
                     // 成功处理
                     MKSwiftHudManager.shared.hide()
-                    pushTabBarPage()
+                    self.pushTabBarPage()
                 } catch {
                     // 错误处理
                     MKSwiftHudManager.shared.hide()
                     let errorMessage = error.localizedDescription
-                    view.showCentralToast(errorMessage)
-                    connectFailed()
+                    self.view.showCentralToast(errorMessage)
+                    self.connectFailed()
                 }
                 
                 continuation.resume()
@@ -571,23 +572,24 @@ extension MKSFBXSScanController: @preconcurrency MKSFBXSTabBarControllerDelegate
 
 extension MKSFBXSScanController: @preconcurrency MKSFBXSScanDeviceInfoCellDelegate {
     func mk_bxs_swf_connectPeripheral(_ dataModel: MKSFBXSScanInfoCellModel) {
-        Task {
+        MKSwiftHudManager.shared.showHUD(with: "Connecting...", in: view, isPenetration: false)
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 if (dataModel.otaMode) {
                     //当前设备处于OTA模式
-                    MKSwiftHudManager.shared.showHUD(with: "Connecting...", in: view, isPenetration: false)
                     _ = try await MKSwiftBXPSCentralManager.shared.connectPeripheral(dataModel.peripheral!,dfu: true)
                     MKSwiftHudManager.shared.hide()
                     let vc = MKSFBXSUpdateController()
-                    navigationController?.pushViewController(vc, animated: true)
+                    self.navigationController?.pushViewController(vc, animated: true)
                     return
                 }
-                await connectPeripheral(dataModel.peripheral!)
+                await self.connectPeripheral(dataModel.peripheral!)
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
-                connectFailed()
+                self.view.showCentralToast(errorMessage)
+                self.connectFailed()
             }
         }
     }

@@ -29,15 +29,16 @@ class MKSFBXSAccelerationController: MKSwiftBaseViewController {
     //MARK: - Super method
     override func rightButtonMethod() {
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await dataModel.config()
+                try await self.dataModel.config()
                 MKSwiftHudManager.shared.hide()
-                view.showCentralToast("Success")
+                self.view.showCentralToast("Success")
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -68,16 +69,17 @@ class MKSFBXSAccelerationController: MKSwiftBaseViewController {
     
     private func readDataFromDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await dataModel.read()
+                try await self.dataModel.read()
                 MKSwiftHudManager.shared.hide()
-                loadSectionDatas()
-                headerView.updateTriggerCount(dataModel.triggerCount)
+                self.loadSectionDatas()
+                self.headerView.updateTriggerCount(self.dataModel.triggerCount)
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -151,16 +153,17 @@ extension MKSFBXSAccelerationController: @preconcurrency MKSFBXSAccelerationHead
     
     func clearMotionTriggerCountButtonPressed() {
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 _ = try await MKSFBXSInterface.clearMotionTriggerCount()
                 MKSwiftHudManager.shared.hide()
-                dataModel.triggerCount = "0"
-                headerView.updateTriggerCount("0")
+                self.dataModel.triggerCount = "0"
+                self.headerView.updateTriggerCount("0")
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

@@ -62,21 +62,22 @@ class MKSFBXSSlotConfigController: MKSwiftBaseViewController {
     private func readDataFromDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Reading...", in: view, isPenetration: false)
         let dataModel = self.dataModel
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                thStatus = await MKSFBXSConnectManager.shared.getThStatus()
-                accStatus = await MKSFBXSConnectManager.shared.getAccStatus()
-                hallStatus = await MKSFBXSConnectManager.shared.getHallStatus()
-                resetByButton = await MKSFBXSConnectManager.shared.getResetByButton()
+                thStatus = await MKSFBXSConnectManager.shared.temperatureHumidityStatus
+                accStatus = await MKSFBXSConnectManager.shared.accelerometerStatus
+                hallStatus = await MKSFBXSConnectManager.shared.hallSensorStatus
+                resetByButton = await MKSFBXSConnectManager.shared.resetByButtonStatus
                 
                 try await dataModel.read()
                 MKSwiftHudManager.shared.hide()
-                headerView.updateFrameType(dataModel.slotType)
-                loadSectionDatas()
+                self.headerView.updateFrameType(dataModel.slotType)
+                self.loadSectionDatas()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -84,15 +85,16 @@ class MKSFBXSSlotConfigController: MKSwiftBaseViewController {
     private func saveDataToDevice() {
         MKSwiftHudManager.shared.showHUD(with: "Config...", in: view, isPenetration: false)
         let dataModel = self.dataModel
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 try await dataModel.config()
                 MKSwiftHudManager.shared.hide()
-                view.showCentralToast("Success")
+                self.view.showCentralToast("Success")
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }

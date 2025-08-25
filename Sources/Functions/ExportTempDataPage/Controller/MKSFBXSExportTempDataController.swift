@@ -100,7 +100,8 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
         
         MKSwiftHudManager.shared.showHUD(with: "Setting...", in: view, isPenetration: false)
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let result = try await MKSFBXSInterface.deleteBXPRecordHTDatas()
                 MKSwiftHudManager.shared.hide()
@@ -109,7 +110,7 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -144,7 +145,8 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
         totalCount = 0
         parseIndex = 0
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
                 let count = try await MKSFBXSInterface.readHTRecordTotalNumbers()
                 MKSwiftHudManager.shared.hide()
@@ -167,7 +169,7 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
             }catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
@@ -515,15 +517,16 @@ extension MKSFBXSExportTempDataController: @preconcurrency MKSFBXSExportDataHead
     func mk_bxs_swf_exportButtonPressed() {
         MKSwiftHudManager.shared.showHUD(with: "Waiting...", in: view, isPenetration: false)
         
-        Task {
+        Task {[weak self] in
+            guard let self = self else { return }
             do {
-                try await MKSFBXSExcelManager.exportExcel(withTHDataList: dataList)
+                try await MKSFBXSExcelManager.exportExcel(withTHDataList: self.dataList)
                 MKSwiftHudManager.shared.hide()
-                sharedExcel()
+                self.sharedExcel()
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                view.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
