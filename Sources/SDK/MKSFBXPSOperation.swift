@@ -110,8 +110,21 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
             return
         }
         
-        commandBlock?()
-        startReceiveTimer()
+        // 切换到主线程执行 commandBlock
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            // 安全检查
+            guard let block = self.commandBlock else {
+                print("Error: commandBlock is nil")
+                self.communicationTimeout()
+                return
+            }
+            
+            // 直接执行
+            block()
+            self.startReceiveTimer()
+        }
     }
     
     private func startReceiveTimer() {
