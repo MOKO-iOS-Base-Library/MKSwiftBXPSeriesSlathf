@@ -40,10 +40,11 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     // MARK: - Life Cycle
     deinit {
         print("MKSFBXSExportHTDataController销毁")
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name("mk_bxs_swf_receiveRecordHTDataNotification"), object: nil)
         DispatchQueue.main.async {[weak self] in
+            guard let self = self else { return }
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("mk_bxs_swf_receiveRecordHTDataNotification"), object: nil)
             _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
-            self?.cancelTimer()
+            self.cancelTimer()
         }
     }
     
