@@ -146,7 +146,7 @@ class MKSFBXSQuickSwitchController: MKSwiftBaseViewController {
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
-                selfview.showCentralToast(errorMessage)
+                self.view.showCentralToast(errorMessage)
             }
         }
     }
