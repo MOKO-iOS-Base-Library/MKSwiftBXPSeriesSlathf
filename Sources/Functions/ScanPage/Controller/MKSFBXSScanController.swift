@@ -48,12 +48,18 @@ public class MKSFBXSScanController: MKSwiftBaseViewController {
     
     deinit {
         print("MKSFBXSScanController deinit")
-        NotificationCenter.default.removeObserver(self)
-        
-        DispatchQueue.main.async {[weak self] in
-            MKSwiftBXPSCentralManager.shared.stopScan()
-            MKSwiftBXPSCentralManager.removeFromCentralList()
-            self?.removeObserverRef()
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if !(navigationController?.viewControllers.contains(self) ?? false) {
+            NotificationCenter.default.removeObserver(self)
+            
+            DispatchQueue.main.async {[weak self] in
+                MKSwiftBXPSCentralManager.shared.stopScan()
+                MKSwiftBXPSCentralManager.removeFromCentralList()
+                self?.removeObserverRef()
+            }
         }
     }
     

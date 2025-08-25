@@ -29,7 +29,13 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
     
     deinit {
         print("MKSFBXSTriggerStepOneController销毁")
-        MKSFBXSTriggerParamManager.sharedDealloc()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if !(navigationController?.viewControllers.contains(self) ?? false) {
+            MKSFBXSTriggerParamManager.sharedDealloc()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {

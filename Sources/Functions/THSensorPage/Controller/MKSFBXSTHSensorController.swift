@@ -15,10 +15,16 @@ class MKSFBXSTHSensorController: MKSwiftBaseViewController {
     
     deinit {
         print("MKSFBXSTHSensorController销毁")
-        DispatchQueue.main.async {
-            _ = MKSwiftBXPSCentralManager.shared.notifyTHSensorData(false)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if !(navigationController?.viewControllers.contains(self) ?? false) {
+            DispatchQueue.main.async {
+                _ = MKSwiftBXPSCentralManager.shared.notifyTHSensorData(false)
+            }
+            NotificationCenter.default.removeObserver(self)
         }
-        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewDidLoad() {

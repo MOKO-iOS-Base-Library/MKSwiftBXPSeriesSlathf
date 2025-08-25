@@ -45,10 +45,16 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
     // MARK: - Life Cycle
     deinit {
         print("MKSFBXSExportTempDataController销毁")
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name("mk_bxs_swf_receiveRecordHTDataNotification"), object: nil)
-        DispatchQueue.main.async {[weak self] in
-            _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
-            self?.cancelTimer()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if !(navigationController?.viewControllers.contains(self) ?? false) {
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name("mk_bxs_swf_receiveRecordHTDataNotification"), object: nil)
+            DispatchQueue.main.async {[weak self] in
+                _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
+                self?.cancelTimer()
+            }
         }
     }
     

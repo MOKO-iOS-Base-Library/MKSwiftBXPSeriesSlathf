@@ -33,7 +33,6 @@ class MKSFBXSTabBarController: UITabBarController {
     // MARK: - Life Cycle
     deinit {
         print("MKSFBXSTabBarController销毁")
-        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -41,6 +40,7 @@ class MKSFBXSTabBarController: UITabBarController {
         
         if !(navigationController?.viewControllers.contains(self) ?? false) {
             MKSwiftBXPSCentralManager.shared.disconnect()
+            NotificationCenter.default.removeObserver(self)
         }
     }
     

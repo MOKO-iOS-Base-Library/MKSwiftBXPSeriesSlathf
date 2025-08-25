@@ -13,9 +13,15 @@ class MKSFBXSAccelerationController: MKSwiftBaseViewController {
     
     deinit {
         print("MKSFBXSAccelerationController deinit")
-        NotificationCenter.default.removeObserver(self)
-        DispatchQueue.main.async {
-            _ = MKSwiftBXPSCentralManager.shared.notifyThreeAxisData(false)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if !(navigationController?.viewControllers.contains(self) ?? false) {
+            NotificationCenter.default.removeObserver(self)
+            DispatchQueue.main.async {
+                _ = MKSwiftBXPSCentralManager.shared.notifyThreeAxisData(false)
+            }
         }
     }
         

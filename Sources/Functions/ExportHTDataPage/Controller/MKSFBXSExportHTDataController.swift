@@ -26,7 +26,6 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     // MARK: - Properties
     private var parseTimer: DispatchSourceTimer?
     private var displayTimer: DispatchSourceTimer?
-    private var notificationObserver: NSObjectProtocol?
     private var receiveComplete = false
     private var temperatureList = [String]()
     private var humidityList = [String]()
@@ -43,11 +42,16 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         print("MKSFBXSExportHTDataController销毁")
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if !(navigationController?.viewControllers.contains(self) ?? false) {
+            performCleanup()
+        }
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-        // 在视图消失时进行清理
-        performCleanup()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -60,85 +64,50 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         readDeviceRunTimes()
     }
     
-    // MARK: - Cleanup Methods
-    private func performCleanup() {
-        // 取消定时器
-        cancelTimer()
-        
-        // 移除通知监听
-        if let observer = notificationObserver {
-            NotificationCenter.default.removeObserver(observer)
-            notificationObserver = nil
-        }
-        
-        // 停止蓝牙通知（在主线程执行）
-        DispatchQueue.main.async {
-            _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
-        }
-    }
-    
-    private func cancelTimer() {
-        // 定时器取消是线程安全的
-        parseTimer?.cancel()
-        parseTimer = nil
-        
-        displayTimer?.cancel()
-        displayTimer = nil
-    }
-    
     // MARK: - Timer Methods
     private func startParseTimer() {
-        // 确保定时器在主队列创建
-        DispatchQueue.main.async { [weak self] in
+        parseTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+        parseTimer?.schedule(deadline: .now(), repeating: 0.3)
+        parseTimer?.setEventHandler { [weak self] in
             guard let self = self else { return }
             
-            self.parseTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
-            self.parseTimer?.schedule(deadline: .now(), repeating: 0.3)
-            self.parseTimer?.setEventHandler { [weak self] in
-                guard let self = self else { return }
-                
-                if self.receiveComplete {
-                    DispatchQueue.main.async {
-                        self.parseTimer?.cancel()
-                        self.topView.resetAllStatus()
-                        self.textView.text = self.textMsg
-                        self.textView.scrollRangeToVisible(NSRange(location: self.textView.text.count, length: 1))
-                        Task { [weak self] in
-                            try? await Task.sleep(nanoseconds: 2_000_000_000)
-                            await MainActor.run {
-                                self?.dismissMaskView()
-                            }
+            if self.receiveComplete {
+                DispatchQueue.main.async {
+                    self.parseTimer?.cancel()
+                    self.topView.resetAllStatus()
+                    self.textView.text = self.textMsg
+                    self.textView.scrollRangeToVisible(NSRange(location: self.textView.text.count, length: 1))
+                    Task { [weak self] in
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                        await MainActor.run {
+                            self?.dismissMaskView()
                         }
                     }
                 }
-                
-                DispatchQueue.main.async {
-                    self.processNotifyDatas()
-                }
             }
-            self.parseTimer?.resume()
+            
+            DispatchQueue.main.async {
+                self.processNotifyDatas()
+            }
         }
+        parseTimer?.resume()
     }
     
     private func startDisplayTimer() {
-        DispatchQueue.main.async { [weak self] in
+        displayTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+        displayTimer?.schedule(deadline: .now(), repeating: 2)
+        displayTimer?.setEventHandler { [weak self] in
             guard let self = self else { return }
             
-            self.displayTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
-            self.displayTimer?.schedule(deadline: .now(), repeating: 2)
-            self.displayTimer?.setEventHandler { [weak self] in
-                guard let self = self else { return }
-                
-                if self.receiveComplete {
-                    self.displayTimer?.cancel()
-                }
-                
-                DispatchQueue.main.async {
-                    self.textView.text = self.textMsg
-                }
+            if self.receiveComplete {
+                self.displayTimer?.cancel()
             }
-            self.displayTimer?.resume()
+            
+            DispatchQueue.main.async {
+                self.textView.text = self.textMsg
+            }
         }
+        displayTimer?.resume()
     }
     
     // MARK: - Data Processing
@@ -307,41 +276,16 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
                 let current = Date().timeIntervalSince1970
                 self.runDate = Date(timeIntervalSince1970: current - Double(result)!)
                 
-                self.setupNotificationObserver()
                 self.loadSubViews()
+                NotificationCenter.default.addObserver(self,
+                                                       selector: #selector(self.receiveRecordHTData(_:)),
+                                                       name: .mk_bxs_swf_receiveRecordHTData,
+                                                       object: nil)
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
                 self.view.showCentralToast(errorMessage)
             }
-        }
-    }
-    
-    private func setupNotificationObserver() {
-        // 使用现代的通知注册方式
-        notificationObserver = NotificationCenter.default.addObserver(
-            forName: .mk_bxs_swf_receiveRecordHTData,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            self?.receiveRecordHTData(notification)
-        }
-    }
-    
-    @objc private func receiveRecordHTData(_ note: Notification) {
-        guard let userInfo = note.userInfo,
-              let content = userInfo["content"] as? String else {
-            return
-        }
-        
-        let total = MKSwiftBleSDKAdopter.getDecimalWithHex(content, range: NSRange(location: 6, length: 4))
-        let index = MKSwiftBleSDKAdopter.getDecimalWithHex(content, range: NSRange(location: 10, length: 4))
-        
-        totalCount = total
-        contentList.append(content)
-        
-        if total == (index + 1) {
-            _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
         }
     }
     
@@ -385,6 +329,46 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
                 self.view.showCentralToast(errorMessage)
             }
         }
+    }
+    
+    @objc private func receiveRecordHTData(_ note: Notification) {
+        guard let userInfo = note.userInfo,
+              let content = userInfo["content"] as? String else {
+            return
+        }
+        
+        let total = MKSwiftBleSDKAdopter.getDecimalWithHex(content, range: NSRange(location: 6, length: 4))
+        let index = MKSwiftBleSDKAdopter.getDecimalWithHex(content, range: NSRange(location: 10, length: 4))
+        
+        totalCount = total
+        contentList.append(content)
+        
+        if total == (index + 1) {
+            _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
+        }
+    }
+    
+    // MARK: - Cleanup Methods
+    private func performCleanup() {
+        // 取消定时器
+        cancelTimer()
+        
+        // 移除通知监听
+        NotificationCenter.default.removeObserver(self)
+        
+        // 停止蓝牙通知（在主线程执行）
+        DispatchQueue.main.async {
+            _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
+        }
+    }
+    
+    private func cancelTimer() {
+        // 定时器取消是线程安全的
+        parseTimer?.cancel()
+        parseTimer = nil
+        
+        displayTimer?.cancel()
+        displayTimer = nil
     }
     
     // MARK: - UI Setup

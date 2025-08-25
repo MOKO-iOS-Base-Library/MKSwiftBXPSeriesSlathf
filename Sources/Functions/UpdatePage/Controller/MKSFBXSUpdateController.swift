@@ -18,8 +18,14 @@ class MKSFBXSUpdateController: MKSwiftBaseViewController {
     
     deinit {
         print("MKSFBXSUpdateController销毁")
-        DispatchQueue.main.async {[weak self] in
-            self?.cancelSource()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if !(navigationController?.viewControllers.contains(self) ?? false) {
+            DispatchQueue.main.async {[weak self] in
+                self?.cancelSource()
+            }
         }
     }
     
