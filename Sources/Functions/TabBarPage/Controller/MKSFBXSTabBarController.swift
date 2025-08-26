@@ -85,15 +85,11 @@ class MKSFBXSTabBarController: UITabBarController {
     
     // MARK: - Notification Handlers
     @objc private func gotoScanPage() {
-        dismiss(animated: true) { [weak self] in
-            self?.pageDelegate?.mk_bxs_swf_needResetScanDelegate(false)
-        }
+        dismissWithPushAnimation(false)
     }
     
     @objc private func dfuUpdateComplete() {
-        dismiss(animated: true) { [weak self] in
-            self?.pageDelegate?.mk_bxs_swf_needResetScanDelegate(true)
-        }
+        dismissWithPushAnimation(true)
     }
     
     @objc private func disconnectTypeNotification(_ notification: Notification) {
@@ -128,6 +124,23 @@ class MKSFBXSTabBarController: UITabBarController {
     
     @objc private func deviceStartDFUProcess() {
         dfu = true
+    }
+    
+    func dismissWithPushAnimation(_ need: Bool) {
+        let transition = CATransition()
+        transition.duration = 0.05
+        transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        transition.type = .push
+        transition.subtype = .fromLeft
+        
+        // 添加到窗口的layer
+        if let window = UIApplication.shared.windows.first {
+            window.layer.add(transition, forKey: kCATransition)
+        }
+        
+        dismiss(animated: true) { [weak self] in
+            self?.pageDelegate?.mk_bxs_swf_needResetScanDelegate(need)
+        }
     }
     
     // MARK: - Private Methods

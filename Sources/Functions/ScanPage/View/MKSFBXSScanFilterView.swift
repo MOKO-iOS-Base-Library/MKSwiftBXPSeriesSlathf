@@ -162,7 +162,7 @@ class MKSFBXSScanFilterView: UIView {
         
         doneButton.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(offsetX)
-            make.bottom.equalToSuperview().offset(-40 - 45)
+            make.bottom.equalToSuperview().offset(-40)
             make.width.equalTo(backViewWidth - 2 * offsetX)
             make.height.equalTo(45)
         }
