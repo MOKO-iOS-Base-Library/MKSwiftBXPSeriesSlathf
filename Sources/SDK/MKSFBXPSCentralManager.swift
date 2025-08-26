@@ -67,6 +67,10 @@ enum BXPSCentralManagerError: LocalizedError {
     
     private var readingNeedPassword: Bool = false
     
+    deinit {
+        print("MKSwiftBXPSCentralManager deinit")
+    }
+    
     
     // MARK: - Initialization
     private override init() {
