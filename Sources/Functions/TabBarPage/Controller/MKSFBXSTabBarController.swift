@@ -137,9 +137,10 @@ class MKSFBXSTabBarController: UITabBarController {
         if let window = UIApplication.shared.windows.first {
             window.layer.add(transition, forKey: kCATransition)
         }
-        
-        dismiss(animated: false) { [weak self] in
-            self?.pageDelegate?.mk_bxs_swf_needResetScanDelegate(need)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {[weak self] in
+            self?.dismiss(animated: false) {
+                self?.pageDelegate?.mk_bxs_swf_needResetScanDelegate(need)
+            }
         }
     }
     

@@ -372,7 +372,9 @@ public class MKSFBXSScanController: MKSwiftBaseViewController {
             window.layer.add(transition, forKey: kCATransition)
         }
         
-        present(vc, animated: false)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {[weak self] in
+            self?.present(vc, animated: false)
+        }        
     }
     
     private func connectFailed() {
