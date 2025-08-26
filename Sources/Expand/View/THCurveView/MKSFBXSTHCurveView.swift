@@ -74,11 +74,13 @@ class MKSFBXSTHCurveView: UIView {
     // MARK: - Constants
     private let valueLabelWidth: CGFloat = 35
     private let maxPointCount = 1000
+    private var pointListCount: Int = 0
     
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        translatesAutoresizingMaskIntoConstraints = false
     }
     
     required init?(coder: NSCoder) {
@@ -107,6 +109,9 @@ class MKSFBXSTHCurveView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
+        // 先移除所有约束，避免重复添加
+        NSLayoutConstraint.deactivate(self.constraints)
+        
         titleLabel.snp.remakeConstraints { make in
             make.leading.equalToSuperview().offset(-40)
             make.width.equalTo(120)
@@ -114,40 +119,44 @@ class MKSFBXSTHCurveView: UIView {
             make.height.equalTo(20)
         }
         
+        let labelHeight = Font.MKFont(10.0).lineHeight
+        let availableHeight = bounds.height - 10 - 5 * labelHeight
+        let dynamicLabelSpace = max(availableHeight / 4, 2) // 确保最小间距为2
+        
         maxLabel.snp.remakeConstraints { make in
             make.leading.equalToSuperview().offset(30)
             make.width.equalTo(valueLabelWidth)
             make.top.equalToSuperview().offset(5)
-            make.height.equalTo(Font.MKFont(10.0).lineHeight)
+            make.height.equalTo(labelHeight)
         }
         
         valueMaxLabel.snp.remakeConstraints { make in
             make.leading.trailing.equalTo(maxLabel)
-            make.top.equalTo(maxLabel.snp.bottom).offset(labelSpace)
-            make.height.equalTo(maxLabel)
+            make.top.equalTo(maxLabel.snp.bottom).offset(dynamicLabelSpace)
+            make.height.equalTo(labelHeight)
         }
         
         aveLabel.snp.remakeConstraints { make in
             make.leading.trailing.equalTo(maxLabel)
-            make.top.equalTo(valueMaxLabel.snp.bottom).offset(labelSpace)
-            make.height.equalTo(maxLabel)
+            make.top.equalTo(valueMaxLabel.snp.bottom).offset(dynamicLabelSpace)
+            make.height.equalTo(labelHeight)
         }
         
         valueMinLabel.snp.remakeConstraints { make in
             make.leading.trailing.equalTo(maxLabel)
-            make.top.equalTo(aveLabel.snp.bottom).offset(labelSpace)
-            make.height.equalTo(maxLabel)
+            make.top.equalTo(aveLabel.snp.bottom).offset(dynamicLabelSpace)
+            make.height.equalTo(labelHeight)
         }
         
         minLabel.snp.remakeConstraints { make in
             make.leading.trailing.equalTo(maxLabel)
             make.bottom.equalToSuperview().offset(-5)
-            make.height.equalTo(maxLabel)
+            make.height.equalTo(labelHeight)
         }
         
         horizontalLine.snp.remakeConstraints { make in
             make.leading.equalTo(maxLabel.snp.trailing).offset(3)
-            make.width.equalTo(0.5) // CUTTING_LINE_HEIGHT
+            make.width.equalTo(0.5)
             make.top.equalToSuperview().offset(5)
             make.bottom.equalToSuperview().offset(-5)
         }
@@ -159,10 +168,10 @@ class MKSFBXSTHCurveView: UIView {
             make.height.equalTo(0.5)
         }
         
-        minLine.snp.remakeConstraints { make in
+        valueMaxLine.snp.remakeConstraints { make in
             make.leading.equalTo(horizontalLine.snp.trailing)
             make.width.equalTo(3)
-            make.centerY.equalTo(minLabel)
+            make.centerY.equalTo(valueMaxLabel)
             make.height.equalTo(0.5)
         }
         
@@ -173,13 +182,6 @@ class MKSFBXSTHCurveView: UIView {
             make.height.equalTo(0.5)
         }
         
-        valueMaxLine.snp.remakeConstraints { make in
-            make.leading.equalTo(horizontalLine.snp.trailing)
-            make.width.equalTo(3)
-            make.centerY.equalTo(valueMaxLabel)
-            make.height.equalTo(0.5)
-        }
-        
         valueMinLine.snp.remakeConstraints { make in
             make.leading.equalTo(horizontalLine.snp.trailing)
             make.width.equalTo(3)
@@ -187,27 +189,32 @@ class MKSFBXSTHCurveView: UIView {
             make.height.equalTo(0.5)
         }
         
-        scrollView.snp.remakeConstraints { make in
+        minLine.snp.remakeConstraints { make in
             make.leading.equalTo(horizontalLine.snp.trailing)
-            make.trailing.equalToSuperview().offset(-5)
-            make.top.equalTo(valueMaxLabel.snp.centerY)
-            make.bottom.equalTo(valueMinLabel.snp.centerY)
+            make.width.equalTo(3)
+            make.centerY.equalTo(minLabel)
+            make.height.equalTo(0.5)
         }
         
-        curveView.frame = CGRect(x: 0, y: 0, width: curveViewWidth, height: curveViewHeight)
+        scrollView.snp.remakeConstraints { make in
+            make.leading.equalTo(horizontalLine.snp.trailing).offset(3)
+            make.trailing.equalToSuperview().offset(-5)
+            make.top.equalTo(maxLabel.snp.bottom).offset(2)
+            make.bottom.equalTo(minLabel.snp.top).offset(-2)
+        }
+        
+        let curveHeight = scrollView.bounds.height
+        let curveWidth = max(bounds.width - 60, CGFloat(pointListCount) * 2)
+        curveView.frame = CGRect(x: 0, y: 0, width: curveWidth, height: curveHeight)
     }
     
     // MARK: - Helper Properties
-    private var labelSpace: CGFloat {
-        return (bounds.height - 10 - 5 * Font.MKFont(10.0).lineHeight) / 4
-    }
-    
     private var curveViewWidth: CGFloat {
         return bounds.width - 60
     }
     
     private var curveViewHeight: CGFloat {
-        return bounds.height - 10 - 2 * Font.MKFont(10.0).lineHeight - 2 * labelSpace
+        return bounds.height - 10 - 2 * Font.MKFont(10.0).lineHeight - 2 * ((bounds.height - 10 - 5 * Font.MKFont(10.0).lineHeight) / 4)
     }
     
     // MARK: - Public Methods
@@ -217,14 +224,9 @@ class MKSFBXSTHCurveView: UIView {
                   minValue: CGFloat) {
         guard !pointList.isEmpty else { return }
         
-        configParams(with: paramModel)
+        pointListCount = pointList.count
         
-        horizontalLine.snp.remakeConstraints { make in
-            make.left.equalTo(maxLabel.snp.right).offset(3)
-            make.width.equalTo(paramModel.yPostionWidth > 0 ? paramModel.yPostionWidth : 0.5)
-            make.top.equalTo(5)
-            make.bottom.equalTo(-5)
-        }
+        configParams(with: paramModel)
         
         let tempValue = (maxValue - minValue) / 2
         valueMaxLabel.text = String(format: "%.1f", maxValue)
@@ -233,21 +235,29 @@ class MKSFBXSTHCurveView: UIView {
         minLabel.text = String(format: "%.1f", minValue - tempValue)
         aveLabel.text = String(format: "%.1f", minValue + tempValue)
         
+        let curveHeight = scrollView.bounds.height
         var tempViewWidth = curveViewWidth
         if pointList.count > maxPointCount {
-            let space = curveViewWidth / CGFloat(maxPointCount)
-            tempViewWidth = CGFloat(pointList.count / maxPointCount) * curveViewWidth + CGFloat(pointList.count % maxPointCount) * space
+            tempViewWidth = CGFloat(pointList.count) * 2
         }
         
-        curveView.frame = CGRect(x: 0, y: 0, width: tempViewWidth, height: curveViewHeight)
+        curveView.frame = CGRect(x: 0, y: 0, width: tempViewWidth, height: curveHeight)
         curveView.updatePointValues(pointList, maxValue: maxValue, minValue: minValue)
         
-        scrollView.contentSize = pointList.count <= maxPointCount ? .zero : CGSize(width: tempViewWidth, height: 0)
+        scrollView.contentSize = CGSize(width: tempViewWidth, height: curveHeight)
+        
+        setNeedsLayout()
+        layoutIfNeeded()
     }
     
     func drawCurve(with pointList: [String], maxValue: CGFloat, minValue: CGFloat) {
         let dataModel = MKSFBXSTHCurveViewModel()
         drawCurve(with: dataModel, pointList: pointList, maxValue: maxValue, minValue: minValue)
+    }
+    
+    func updateLayout() {
+        setNeedsLayout()
+        layoutIfNeeded()
     }
     
     // MARK: - Private Methods
@@ -267,6 +277,16 @@ class MKSFBXSTHCurveView: UIView {
         }
     }
     
+    private func debugConstraints() {
+        #if DEBUG
+        print("当前视图大小: \(bounds)")
+        print("标签高度: \(Font.MKFont(10.0).lineHeight)")
+        let availableHeight = bounds.height - 10 - 5 * Font.MKFont(10.0).lineHeight
+        print("可用高度: \(availableHeight)")
+        print("计算间距: \(availableHeight / 4)")
+        #endif
+    }
+    
     // MARK: - UI Components (Lazy loading)
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -283,17 +303,75 @@ class MKSFBXSTHCurveView: UIView {
         return view
     }()
     
-    private lazy var maxLabel = createLabel()
-    private lazy var valueMaxLabel = createLabel()
-    private lazy var aveLabel = createLabel()
-    private lazy var valueMinLabel = createLabel()
-    private lazy var minLabel = createLabel()
+    private lazy var maxLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = Color.defaultText
+        label.textAlignment = .right
+        label.font = UIFont.systemFont(ofSize: 10)
+        return label
+    }()
     
-    private lazy var maxLine = createLine()
-    private lazy var valueMaxLine = createLine()
-    private lazy var aveLine = createLine()
-    private lazy var valueMinLine = createLine()
-    private lazy var minLine = createLine()
+    private lazy var valueMaxLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = Color.defaultText
+        label.textAlignment = .right
+        label.font = UIFont.systemFont(ofSize: 10)
+        return label
+    }()
+    
+    private lazy var aveLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = Color.defaultText
+        label.textAlignment = .right
+        label.font = UIFont.systemFont(ofSize: 10)
+        return label
+    }()
+    
+    private lazy var valueMinLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = Color.defaultText
+        label.textAlignment = .right
+        label.font = UIFont.systemFont(ofSize: 10)
+        return label
+    }()
+    
+    private lazy var minLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = Color.defaultText
+        label.textAlignment = .right
+        label.font = UIFont.systemFont(ofSize: 10)
+        return label
+    }()
+    
+    private lazy var maxLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = Color.rgb(136, 136, 136)
+        return view
+    }()
+    
+    private lazy var valueMaxLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = Color.rgb(136, 136, 136)
+        return view
+    }()
+    
+    private lazy var aveLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = Color.rgb(136, 136, 136)
+        return view
+    }()
+    
+    private lazy var valueMinLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = Color.rgb(136, 136, 136)
+        return view
+    }()
+    
+    private lazy var minLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = Color.rgb(136, 136, 136)
+        return view
+    }()
     
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -307,20 +385,6 @@ class MKSFBXSTHCurveView: UIView {
         let view = MKSFBXSCurveView()
         return view
     }()
-    
-    private func createLabel() -> UILabel {
-        let label = UILabel()
-        label.textColor = Color.defaultText
-        label.textAlignment = .right
-        label.font = UIFont.systemFont(ofSize: 10)
-        return label
-    }
-    
-    private func createLine() -> UIView {
-        let view = UIView()
-        view.backgroundColor = Color.rgb(136, 136, 136)
-        return view
-    }
 }
 
 // MARK: - UIScrollViewDelegate
