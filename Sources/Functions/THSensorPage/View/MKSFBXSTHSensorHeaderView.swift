@@ -34,7 +34,7 @@ class MKSFBXSTHSensorHeaderView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = UIColor(red: 242/255.0, green: 242/255.0, blue: 242/255.0, alpha: 1.0)
+        backgroundColor = Color.rgb(242, 242, 242)
         setupUI()
     }
     
@@ -42,19 +42,8 @@ class MKSFBXSTHSensorHeaderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override var intrinsicContentSize: CGSize {
-        return CGSize(width: UIView.noIntrinsicMetric, height: 200) // 提供默认高度
-    }
-    
-    private func setupUI() {
-        addSubview(backView)
-        backView.addSubview(msgLabel)
-        backView.addSubview(tempView)
-        backView.addSubview(humidityView)
-        backView.addSubview(samplingLabel)
-        backView.addSubview(textField)
-        backView.addSubview(unitLabel)
-        
+    override func layoutSubviews() {
+        super.layoutSubviews()
         backView.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(5)
             make.right.equalToSuperview().offset(-5)
@@ -84,30 +73,35 @@ class MKSFBXSTHSensorHeaderView: UIView {
         }
         
         samplingLabel.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(10)
-            make.width.lessThanOrEqualTo(120) // 改为 lessThanOrEqualTo 而不是固定宽度
+            make.left.equalToSuperview().offset(45.0)
+            make.width.lessThanOrEqualTo(110.0)
             make.centerY.equalTo(textField.snp.centerY)
-            make.height.equalTo(UIFont.systemFont(ofSize: 13).lineHeight)
+            make.height.equalTo(Font.MKFont(13.0).lineHeight)
         }
         
         textField.snp.makeConstraints { make in
             make.left.equalTo(samplingLabel.snp.right).offset(5)
-            make.width.equalTo(65).priority(.high) // 添加优先级
+            make.width.equalTo(65)
             make.top.equalTo(humidityView.snp.bottom).offset(10)
             make.height.equalTo(20)
         }
         
         unitLabel.snp.makeConstraints { make in
-            make.left.equalTo(textField.snp.right).offset(3)
-            make.right.lessThanOrEqualToSuperview().offset(-10) // 改为 lessThanOrEqualTo
+            make.right.equalTo(-10.0)
+            make.left.equalTo(textField.snp.right).offset(3.0)
             make.centerY.equalTo(textField.snp.centerY)
-            make.height.equalTo(UIFont.systemFont(ofSize: 13).lineHeight)
+            make.height.equalTo(Font.MKFont(13.0).lineHeight)
         }
-        
-        // 添加低优先级约束，防止宽度为0时的冲突
-        samplingLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        textField.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        unitLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+    }
+    
+    private func setupUI() {
+        addSubview(backView)
+        backView.addSubview(msgLabel)
+        backView.addSubview(tempView)
+        backView.addSubview(humidityView)
+        backView.addSubview(samplingLabel)
+        backView.addSubview(textField)
+        backView.addSubview(unitLabel)
     }
     
     //MARK: - lazy
@@ -187,11 +181,6 @@ private class MKSFBXSHTConfigValueView: UIView {
         addSubview(msgLabel)
         addSubview(valueLabel)
         addSubview(unitLabel)
-        
-        // 设置内容压缩和吸附优先级
-        msgLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        valueLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-        unitLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
     }
     
     required init?(coder: NSCoder) {
@@ -200,9 +189,7 @@ private class MKSFBXSHTConfigValueView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
-        let availableWidth = bounds.width - 70 // 减去图标和间距的固定宽度
-        
+                
         leftIcon.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(5)
             make.width.equalTo(25)
@@ -212,23 +199,23 @@ private class MKSFBXSHTConfigValueView: UIView {
         
         msgLabel.snp.remakeConstraints { make in
             make.left.equalTo(leftIcon.snp.right).offset(5)
-            make.width.lessThanOrEqualTo(availableWidth * 0.5) // 限制最大宽度
+            make.right.equalTo(valueLabel.snp.left).offset(-5.0)
             make.centerY.equalToSuperview()
-            make.height.equalTo(UIFont.systemFont(ofSize: 15).lineHeight)
+            make.height.equalTo(Font.MKFont(15.0).lineHeight)
         }
         
         valueLabel.snp.remakeConstraints { make in
-            make.right.equalTo(unitLabel.snp.left).offset(-5)
-            make.width.lessThanOrEqualTo(85) // 改为 lessThanOrEqualTo
+            make.right.equalTo(unitLabel.snp.left).offset(-10.0)
+            make.width.equalTo(85.0)
             make.centerY.equalToSuperview()
-            make.height.equalTo(UIFont.systemFont(ofSize: 28).lineHeight)
+            make.height.equalTo(Font.MKFont(28.0).lineHeight)
         }
         
         unitLabel.snp.remakeConstraints { make in
             make.right.equalToSuperview().offset(-5)
-            make.width.lessThanOrEqualTo(40) // 改为 lessThanOrEqualTo
+            make.width.equalTo(30.0)
             make.bottom.equalTo(valueLabel.snp.bottom)
-            make.height.equalTo(UIFont.systemFont(ofSize: 12).lineHeight)
+            make.height.equalTo(Font.MKFont(12.0).lineHeight)
         }
     }
     

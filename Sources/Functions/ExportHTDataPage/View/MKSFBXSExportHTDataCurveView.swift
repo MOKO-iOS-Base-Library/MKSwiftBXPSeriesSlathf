@@ -64,7 +64,7 @@ class MKSFBXSExportHTDataCurveView: UIView {
             make.left.equalTo(10.0)
             make.right.equalTo(-10.0)
             make.top.equalTo(5.0)
-            make.height.equalTo(UIFont.systemFont(ofSize: 10).lineHeight)
+            make.height.equalTo(Font.MKFont(10.0).lineHeight)
         }
         
         displayLabel.snp.remakeConstraints { make in

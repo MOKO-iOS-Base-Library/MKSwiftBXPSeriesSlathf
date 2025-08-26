@@ -321,8 +321,8 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
                 }
                 
                 _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(true)
-                self.startParseTimer()
-                self.startDisplayTimer()
+//                self.startParseTimer()
+//                self.startDisplayTimer()
             }catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
