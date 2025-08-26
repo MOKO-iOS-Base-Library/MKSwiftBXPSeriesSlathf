@@ -26,7 +26,7 @@ let package = Package(
                 "DateTimePicker"
             ],
             path: "Sources",
-            resources: [.process("Resources")],
+            resources: [.process("Assets")],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ]
