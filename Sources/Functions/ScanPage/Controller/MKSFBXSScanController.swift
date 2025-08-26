@@ -360,21 +360,7 @@ public class MKSFBXSScanController: MKSwiftBaseViewController {
         vc.modalPresentationStyle = .fullScreen
         vc.pageDelegate = self
         
-        // 创建自定义的 push 动画
-        let transition = CATransition()
-        transition.duration = 0.1
-        transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        transition.type = .push
-        transition.subtype = .fromRight
-        
-        // 添加动画到窗口的layer
-        if let window = UIApplication.shared.windows.first {
-            window.layer.add(transition, forKey: kCATransition)
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {[weak self] in
-            self?.present(vc, animated: false)
-        }        
+        present(vc, animated: true)
     }
     
     private func connectFailed() {

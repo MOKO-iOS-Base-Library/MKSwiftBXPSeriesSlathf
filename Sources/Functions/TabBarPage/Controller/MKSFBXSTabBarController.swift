@@ -127,20 +127,8 @@ class MKSFBXSTabBarController: UITabBarController {
     }
     
     func dismissWithPushAnimation(_ need: Bool) {
-        let transition = CATransition()
-        transition.duration = 0.1
-        transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        transition.type = .push
-        transition.subtype = .fromLeft
-        
-        // 添加到窗口的layer
-        if let window = UIApplication.shared.windows.first {
-            window.layer.add(transition, forKey: kCATransition)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {[weak self] in
-            self?.dismiss(animated: false) {
-                self?.pageDelegate?.mk_bxs_swf_needResetScanDelegate(need)
-            }
+        dismiss(animated: true) {[weak self] in
+            self?.pageDelegate?.mk_bxs_swf_needResetScanDelegate(need)
         }
     }
     
