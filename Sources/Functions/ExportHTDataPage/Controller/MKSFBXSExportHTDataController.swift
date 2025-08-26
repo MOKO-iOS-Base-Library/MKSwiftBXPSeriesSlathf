@@ -37,6 +37,7 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     
     private var runDate: Date?
     private var isTimersRunning = false
+    private var timerQueue = DispatchQueue(label: "com.moko.timerQueue", attributes: .concurrent)
     
     // MARK: - Life Cycle
     deinit {
@@ -67,62 +68,72 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     
     // MARK: - Timer Methods
     private func startParseTimer() {
-        // 确保在主线程操作定时器
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self, !self.isTimersRunning else { return }
+        // 先取消现有的定时器
+        cancelTimer()
+        
+        // 创建新的定时器
+        parseTimer = DispatchSource.makeTimerSource(queue: timerQueue)
+        parseTimer?.schedule(deadline: .now(), repeating: 0.3, leeway: .milliseconds(10))
+        
+        parseTimer?.setEventHandler { [weak self] in
+            guard let self = self else { return }
             
-            // 先取消现有的定时器
-            self.cancelTimer()
-            
-            self.parseTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.main) // 使用主队列
-            self.parseTimer?.schedule(deadline: .now(), repeating: 0.3)
-            self.parseTimer?.setEventHandler { [weak self] in
-                guard let self = self else { return }
-                
-                if self.receiveComplete {
+            // 检查是否完成
+            if self.receiveComplete {
+                DispatchQueue.main.async {
                     self.cancelTimer()
                     self.topView.resetAllStatus()
                     self.textView.text = self.textMsg
                     self.textView.scrollRangeToVisible(NSRange(location: self.textView.text.count, length: 1))
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                        self?.dismissMaskView()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        self.dismissMaskView()
                     }
-                    return
                 }
-                
+                return
+            }
+            
+            // 处理数据
+            DispatchQueue.main.async {
                 self.processNotifyDatas()
             }
-            
-            // 设置取消时的清理处理
-            self.parseTimer?.setCancelHandler { [weak self] in
-                self?.isTimersRunning = false
-            }
-            
-            self.parseTimer?.resume()
-            self.isTimersRunning = true
         }
+        
+        // 设置取消处理器
+        parseTimer?.setCancelHandler { [weak self] in
+            self?.isTimersRunning = false
+            print("Parse timer cancelled")
+        }
+        
+        // 启动定时器
+        parseTimer?.resume()
+        isTimersRunning = true
+        print("Parse timer started")
     }
     
     private func startDisplayTimer() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self, !self.isTimersRunning else { return }
+        // 创建显示定时器（在主线程运行）
+        displayTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
+        displayTimer?.schedule(deadline: .now(), repeating: 2.0, leeway: .milliseconds(50))
+        
+        displayTimer?.setEventHandler { [weak self] in
+            guard let self = self else { return }
             
-            self.displayTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.main) // 使用主队列
-            self.displayTimer?.schedule(deadline: .now(), repeating: 2)
-            self.displayTimer?.setEventHandler { [weak self] in
-                guard let self = self else { return }
-                
-                if self.receiveComplete {
-                    self.cancelTimer()
-                    return
-                }
-                
-                self.textView.text = self.textMsg
+            if self.receiveComplete {
+                self.displayTimer?.cancel()
+                self.displayTimer = nil
+                return
             }
             
-            self.displayTimer?.resume()
+            // 更新文本显示
+            if !self.textMsg.isEmpty {
+                self.textView.text = self.textMsg
+                self.textView.scrollRangeToVisible(NSRange(location: self.textView.text.count, length: 1))
+            }
         }
+        
+        displayTimer?.resume()
+        print("Display timer started")
     }
     
     // MARK: - Data Processing
@@ -175,7 +186,7 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     }
     
     private func processNotifyDatas() {
-        if parseIndex >= contentList.count {
+        guard parseIndex < contentList.count else {
             return
         }
         
@@ -188,6 +199,7 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         parseIndex += 1
         if parseIndex == totalCount {
             receiveComplete = true
+            print("All data processed, total: \(totalCount)")
         }
     }
     
@@ -235,7 +247,7 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         
         let infoDictionary = Bundle.main.infoDictionary
         let version = infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-        let bodyMsg = "APP Version: \(version) + + OS: (App.systemVersion)"
+        let bodyMsg = "APP Version: \(version) + + OS: \(App.systemVersion)"
         
         let mailComposer = MFMailComposeViewController()
         mailComposer.mailComposeDelegate = self
@@ -309,7 +321,11 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         receiveComplete = false
         totalCount = 0
         parseIndex = 0
-        contentList.removeAll() // 清空之前的数据
+        contentList.removeAll()
+        dataList.removeAll()
+        temperatureList.removeAll()
+        humidityList.removeAll()
+        textMsg = ""
         
         Task {[weak self] in
             guard let self = self else {
@@ -322,18 +338,26 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
                 self.maskView.show(with: self.view)
                 self.maskView.updateTotalNumber("\(count)")
                 
-                if Int(count) == 0 {
+                let countValue = Int(count) ?? 0
+                if countValue == 0 {
                     self.topView.resetAllStatus()
                     self.textView.text = ""
-                    self.textMsg = ""
                     self.maskView.updateCurrentNumber("0")
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                        self?.dismissMaskView()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        self.dismissMaskView()
                     }
                     return
                 }
                 
+                // 检查蓝牙连接状态
+                guard MKSwiftBXPSCentralManager.shared.connectStatus == .connected else {
+                    self.view.showCentralToast("Device disconnected")
+                    self.dismissMaskView()
+                    return
+                }
+                
+                // 启用通知
                 let notifySuccess = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(true)
                 guard notifySuccess else {
                     self.view.showCentralToast("Enable notification failed")
@@ -341,15 +365,10 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
                     return
                 }
                 
-                // 确保蓝牙连接正常
-                guard MKSwiftBXPSCentralManager.shared.connectStatus == .connected else {
-                    self.view.showCentralToast("Device disconnected")
-                    self.dismissMaskView()
-                    return
-                }
-                
+                print("Starting timers for \(countValue) data points")
                 self.startParseTimer()
                 self.startDisplayTimer()
+                
             } catch {
                 MKSwiftHudManager.shared.hide()
                 let errorMessage = error.localizedDescription
@@ -371,8 +390,11 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         totalCount = total
         contentList.append(content)
         
+        print("Received data packet \(index + 1)/\(total)")
+        
         if total == (index + 1) {
             _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
+            print("All data packets received")
         }
     }
     
@@ -391,22 +413,19 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     }
     
     private func cancelTimer() {
-        // 确保在主线程取消定时器
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            if self.parseTimer != nil {
-                self.parseTimer?.cancel()
-                self.parseTimer = nil
-            }
-            
-            if self.displayTimer != nil {
-                self.displayTimer?.cancel()
-                self.displayTimer = nil
-            }
-            
-            self.isTimersRunning = false
+        // 确保定时器正确取消
+        if let parseTimer = parseTimer {
+            parseTimer.cancel()
+            self.parseTimer = nil
         }
+        
+        if let displayTimer = displayTimer {
+            displayTimer.cancel()
+            self.displayTimer = nil
+        }
+        
+        isTimersRunning = false
+        print("All timers cancelled")
     }
     
     // MARK: - UI Setup
