@@ -13,16 +13,16 @@ import MKBaseSwiftModule
 import MKSwiftBeaconXCustomUI
 import MKSwiftBleModule
 
-public enum BXSScanType: Int {
+@objc public enum BXSScanType: Int {
     case common
     case temperatureAndHumidity
     case temperature
 }
 
-public class MKSFBXSScanController: MKSwiftBaseViewController {
+@objc public class MKSFBXSScanController: MKSwiftBaseViewController {
     // MARK: - Properties
     
-    var scanType: BXSScanType = .common
+    @objc var scanType: BXSScanType = .common
     
     private let localPasswordKey = "mk_bxs_swf_passwordKey"
     private let offsetX: CGFloat = 15.0
