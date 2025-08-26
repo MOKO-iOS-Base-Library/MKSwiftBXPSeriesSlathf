@@ -17,14 +17,11 @@ class MKSFBXSTHSensorController: MKSwiftBaseViewController {
         print("MKSFBXSTHSensorController销毁")
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if !(navigationController?.viewControllers.contains(self) ?? false) {
-            DispatchQueue.main.async {
-                _ = MKSwiftBXPSCentralManager.shared.notifyTHSensorData(false)
-            }
-            NotificationCenter.default.removeObserver(self)
+    override func viewDidPopFromNavigationStack() {
+        DispatchQueue.main.async {
+            _ = MKSwiftBXPSCentralManager.shared.notifyTHSensorData(false)
         }
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func viewDidLoad() {

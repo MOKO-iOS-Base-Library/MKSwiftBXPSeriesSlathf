@@ -43,11 +43,8 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         print("MKSFBXSExportHTDataController销毁")
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if !(navigationController?.viewControllers.contains(self) ?? false) {
-            performCleanup()
-        }
+    override func viewDidPopFromNavigationStack() {
+        performCleanup()
     }
     
     override func viewWillDisappear(_ animated: Bool) {

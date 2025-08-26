@@ -20,12 +20,9 @@ class MKSFBXSUpdateController: MKSwiftBaseViewController {
         print("MKSFBXSUpdateController销毁")
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if !(navigationController?.viewControllers.contains(self) ?? false) {
-            DispatchQueue.main.async {[weak self] in
-                self?.cancelSource()
-            }
+    override func viewDidPopFromNavigationStack() {
+        DispatchQueue.main.async {[weak self] in
+            self?.cancelSource()
         }
     }
     

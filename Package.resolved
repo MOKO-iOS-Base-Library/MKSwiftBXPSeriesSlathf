@@ -1,5 +1,5 @@
 {
-  "originHash" : "4db8539fd5f0a648c7404136105d681b8e8750bf81fec59f9ef94d51a8dc2fb7",
+  "originHash" : "fb94e33c886c6925bd88e21651ab0cdeb3670a824d3692ae2be51eda937cce98",
   "pins" : [
     {
       "identity" : "datetimepicker",
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MOKO-iOS-Base-Library/MKBaseSwiftModule.git",
       "state" : {
-        "revision" : "2ccd95c2e4a57b5f89c96f7ff2350fdc7ca43dff",
-        "version" : "1.0.14"
+        "revision" : "af9d47e35c8c581ef3f37a5280a08348990fbd0b",
+        "version" : "1.0.15"
       }
     },
     {
