@@ -24,8 +24,8 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     }
     
     // MARK: - Properties
-    private var parseTimer: DispatchSourceTimer?
-    private var displayTimer: DispatchSourceTimer?
+    private var parseTimer: Timer?
+    private var displayTimer: Timer?
     private var receiveComplete = false
     private var temperatureList = [String]()
     private var humidityList = [String]()
@@ -37,7 +37,6 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     
     private var runDate: Date?
     private var isTimersRunning = false
-    private var timerQueue = DispatchQueue(label: "com.moko.timerQueue", attributes: .concurrent)
     
     // MARK: - Life Cycle
     deinit {
@@ -71,69 +70,64 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         // 先取消现有的定时器
         cancelTimer()
         
-        // 创建新的定时器
-        parseTimer = DispatchSource.makeTimerSource(queue: timerQueue)
-        parseTimer?.schedule(deadline: .now(), repeating: 0.3, leeway: .milliseconds(10))
+        // 使用 Timer 而不是 DispatchSourceTimer
+        parseTimer = Timer.scheduledTimer(timeInterval: 0.3,
+                                         target: self,
+                                         selector: #selector(parseTimerFired),
+                                         userInfo: nil,
+                                         repeats: true)
         
-        parseTimer?.setEventHandler { [weak self] in
-            guard let self = self else { return }
-            
-            // 检查是否完成
-            if self.receiveComplete {
-                DispatchQueue.main.async {
-                    self.cancelTimer()
-                    self.topView.resetAllStatus()
-                    self.textView.text = self.textMsg
-                    self.textView.scrollRangeToVisible(NSRange(location: self.textView.text.count, length: 1))
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        self.dismissMaskView()
-                    }
-                }
-                return
-            }
-            
-            // 处理数据
-            DispatchQueue.main.async {
-                self.processNotifyDatas()
-            }
-        }
+        // 添加到 RunLoop
+        RunLoop.main.add(parseTimer!, forMode: .common)
         
-        // 设置取消处理器
-        parseTimer?.setCancelHandler { [weak self] in
-            self?.isTimersRunning = false
-            print("Parse timer cancelled")
-        }
-        
-        // 启动定时器
-        parseTimer?.resume()
         isTimersRunning = true
         print("Parse timer started")
     }
     
     private func startDisplayTimer() {
-        // 创建显示定时器（在主线程运行）
-        displayTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
-        displayTimer?.schedule(deadline: .now(), repeating: 2.0, leeway: .milliseconds(50))
+        // 使用 Timer 而不是 DispatchSourceTimer
+        displayTimer = Timer.scheduledTimer(timeInterval: 2.0,
+                                           target: self,
+                                           selector: #selector(displayTimerFired),
+                                           userInfo: nil,
+                                           repeats: true)
         
-        displayTimer?.setEventHandler { [weak self] in
-            guard let self = self else { return }
+        // 添加到 RunLoop
+        RunLoop.main.add(displayTimer!, forMode: .common)
+        
+        print("Display timer started")
+    }
+    
+    @objc private func parseTimerFired() {
+        // 检查是否完成
+        if receiveComplete {
+            cancelTimer()
+            topView.resetAllStatus()
+            textView.text = textMsg
+            textView.scrollRangeToVisible(NSRange(location: textView.text.count, length: 1))
             
-            if self.receiveComplete {
-                self.displayTimer?.cancel()
-                self.displayTimer = nil
-                return
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                self?.dismissMaskView()
             }
-            
-            // 更新文本显示
-            if !self.textMsg.isEmpty {
-                self.textView.text = self.textMsg
-                self.textView.scrollRangeToVisible(NSRange(location: self.textView.text.count, length: 1))
-            }
+            return
         }
         
-        displayTimer?.resume()
-        print("Display timer started")
+        // 处理数据
+        processNotifyDatas()
+    }
+    
+    @objc private func displayTimerFired() {
+        if receiveComplete {
+            displayTimer?.invalidate()
+            displayTimer = nil
+            return
+        }
+        
+        // 更新文本显示
+        if !textMsg.isEmpty {
+            textView.text = textMsg
+            textView.scrollRangeToVisible(NSRange(location: textView.text.count, length: 1))
+        }
     }
     
     // MARK: - Data Processing
@@ -415,12 +409,12 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     private func cancelTimer() {
         // 确保定时器正确取消
         if let parseTimer = parseTimer {
-            parseTimer.cancel()
+            parseTimer.invalidate()
             self.parseTimer = nil
         }
         
         if let displayTimer = displayTimer {
-            displayTimer.cancel()
+            displayTimer.invalidate()
             self.displayTimer = nil
         }
         
