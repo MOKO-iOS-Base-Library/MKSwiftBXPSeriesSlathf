@@ -42,6 +42,10 @@ class MKSFBXSTHSensorHeaderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: UIView.noIntrinsicMetric, height: 200) // 提供默认高度
+    }
+    
     private func setupUI() {
         addSubview(backView)
         backView.addSubview(msgLabel)
@@ -80,25 +84,30 @@ class MKSFBXSTHSensorHeaderView: UIView {
         }
         
         samplingLabel.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(45)
-            make.width.equalTo(110)
+            make.left.equalToSuperview().offset(10)
+            make.width.lessThanOrEqualTo(120) // 改为 lessThanOrEqualTo 而不是固定宽度
             make.centerY.equalTo(textField.snp.centerY)
             make.height.equalTo(UIFont.systemFont(ofSize: 13).lineHeight)
         }
         
         textField.snp.makeConstraints { make in
             make.left.equalTo(samplingLabel.snp.right).offset(5)
-            make.width.equalTo(65)
+            make.width.equalTo(65).priority(.high) // 添加优先级
             make.top.equalTo(humidityView.snp.bottom).offset(10)
             make.height.equalTo(20)
         }
         
         unitLabel.snp.makeConstraints { make in
-            make.right.equalToSuperview().offset(-10)
             make.left.equalTo(textField.snp.right).offset(3)
+            make.right.lessThanOrEqualToSuperview().offset(-10) // 改为 lessThanOrEqualTo
             make.centerY.equalTo(textField.snp.centerY)
             make.height.equalTo(UIFont.systemFont(ofSize: 13).lineHeight)
         }
+        
+        // 添加低优先级约束，防止宽度为0时的冲突
+        samplingLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        textField.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        unitLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
     
     //MARK: - lazy
@@ -166,6 +175,7 @@ class MKSFBXSTHSensorHeaderView: UIView {
         let label = UILabel()
         label.textAlignment = .left
         label.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["sec", "   (1 ~ 65535)"], fonts: [Font.MKFont(13.0),Font.MKFont(12.0)], colors: [Color.defaultText,Color.rgb(223, 223, 223)])
+        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return label
     }()
 }
@@ -177,6 +187,11 @@ private class MKSFBXSHTConfigValueView: UIView {
         addSubview(msgLabel)
         addSubview(valueLabel)
         addSubview(unitLabel)
+        
+        // 设置内容压缩和吸附优先级
+        msgLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        valueLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        unitLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
     }
     
     required init?(coder: NSCoder) {
@@ -185,6 +200,8 @@ private class MKSFBXSHTConfigValueView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        
+        let availableWidth = bounds.width - 70 // 减去图标和间距的固定宽度
         
         leftIcon.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(5)
@@ -195,21 +212,21 @@ private class MKSFBXSHTConfigValueView: UIView {
         
         msgLabel.snp.remakeConstraints { make in
             make.left.equalTo(leftIcon.snp.right).offset(5)
-            make.right.equalTo(valueLabel.snp.left).offset(-5)
+            make.width.lessThanOrEqualTo(availableWidth * 0.5) // 限制最大宽度
             make.centerY.equalToSuperview()
             make.height.equalTo(UIFont.systemFont(ofSize: 15).lineHeight)
         }
         
         valueLabel.snp.remakeConstraints { make in
-            make.right.equalTo(unitLabel.snp.left).offset(-10)
-            make.width.equalTo(85)
+            make.right.equalTo(unitLabel.snp.left).offset(-5)
+            make.width.lessThanOrEqualTo(85) // 改为 lessThanOrEqualTo
             make.centerY.equalToSuperview()
             make.height.equalTo(UIFont.systemFont(ofSize: 28).lineHeight)
         }
         
         unitLabel.snp.remakeConstraints { make in
             make.right.equalToSuperview().offset(-5)
-            make.width.equalTo(30)
+            make.width.lessThanOrEqualTo(40) // 改为 lessThanOrEqualTo
             make.bottom.equalTo(valueLabel.snp.bottom)
             make.height.equalTo(UIFont.systemFont(ofSize: 12).lineHeight)
         }
