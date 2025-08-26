@@ -128,7 +128,7 @@ class MKSFBXSTabBarController: UITabBarController {
     
     func dismissWithPushAnimation(_ need: Bool) {
         let transition = CATransition()
-        transition.duration = 0.05
+        transition.duration = 0.1
         transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
         transition.type = .push
         transition.subtype = .fromLeft

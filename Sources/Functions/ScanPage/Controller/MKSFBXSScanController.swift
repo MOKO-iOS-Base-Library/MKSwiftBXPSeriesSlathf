@@ -362,7 +362,7 @@ public class MKSFBXSScanController: MKSwiftBaseViewController {
         
         // 创建自定义的 push 动画
         let transition = CATransition()
-        transition.duration = 0.01
+        transition.duration = 0.1
         transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
         transition.type = .push
         transition.subtype = .fromRight
