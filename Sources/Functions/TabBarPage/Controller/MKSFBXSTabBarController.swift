@@ -138,7 +138,7 @@ class MKSFBXSTabBarController: UITabBarController {
             window.layer.add(transition, forKey: kCATransition)
         }
         
-        dismiss(animated: true) { [weak self] in
+        dismiss(animated: false) { [weak self] in
             self?.pageDelegate?.mk_bxs_swf_needResetScanDelegate(need)
         }
     }

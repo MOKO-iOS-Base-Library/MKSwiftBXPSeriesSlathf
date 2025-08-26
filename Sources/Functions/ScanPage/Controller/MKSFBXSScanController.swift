@@ -372,7 +372,7 @@ public class MKSFBXSScanController: MKSwiftBaseViewController {
             window.layer.add(transition, forKey: kCATransition)
         }
         
-        present(vc, animated: true)
+        present(vc, animated: false)
     }
     
     private func connectFailed() {
