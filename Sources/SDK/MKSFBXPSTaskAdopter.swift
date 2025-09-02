@@ -211,9 +211,9 @@ class MKSFBXSTaskAdopter {
             // Read three-axis sensor parameters
             operationID = .taskReadThreeAxisDataParamsOperation
             resultDic = [
-                "samplingRate":content[0],
-                "gravityReference":content[1],
-                "motionThreshold":content[2]
+                "samplingRate":Int(content[0]),
+                "gravityReference":Int(content[1]),
+                "motionThreshold":Int(content[2])
             ]
         } else if cmd == 0x23 {
             // Read button reset function
