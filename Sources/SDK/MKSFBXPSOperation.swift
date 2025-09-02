@@ -24,13 +24,18 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     
     // MARK: - Properties
     
-    private var receiveTimer: DispatchSourceTimer?
+    private let lock = NSLock()
+    private let timerQueue = DispatchQueue(label: "com.mk.bxps.timer", attributes: .concurrent)
+    
     private var operationID: MKSFBXSTaskOperationID
-    private var completeBlock: ((Error?, [String: Any]?) -> Void)?
+    private var completeBlock: ((Error?, MKSwiftBleResult?) -> Void)?
     private var commandBlock: (() -> Void)?
+    
+    private var receiveTimer: DispatchSourceTimer?
     private var timeout: Bool = false
     private var receiveTimerCount: Int = 0
     private var dataList: [Data] = []
+    private var timerStarted: Bool = false
     
     private var _executing: Bool = false {
         willSet {
@@ -51,10 +56,14 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     }
     
     override var isExecuting: Bool {
+        lock.lock()
+        defer { lock.unlock() }
         return _executing
     }
     
     override var isFinished: Bool {
+        lock.lock()
+        defer { lock.unlock() }
         return _finished
     }
     
@@ -66,7 +75,7 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     
     init(operationID: MKSFBXSTaskOperationID,
          commandBlock: (() -> Void)?,
-         completeBlock: ((Error?, [String: Any]?) -> Void)?) {
+         completeBlock: ((Error?, MKSwiftBleResult?) -> Void)?) {
         self.operationID = operationID
         self.commandBlock = commandBlock
         self.completeBlock = completeBlock
@@ -77,18 +86,30 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     
     deinit {
         print("MP任务销毁")
+        stopReceiveTimer()
     }
     
     // MARK: - Operation Overrides
     
     override func start() {
+        lock.lock()
+        defer { lock.unlock() }
+        
         if isFinished || isCancelled {
-            _finished = true
+            finishOperation()
             return
         }
         
         _executing = true
         startCommunication()
+    }
+    
+    override func cancel() {
+        lock.lock()
+        defer { lock.unlock() }
+        
+        super.cancel()
+        communicationTimeout()
     }
     
     // MARK: - MKBLEBaseOperationProtocol
@@ -107,12 +128,21 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     
     private func startCommunication() {
         if isCancelled {
+            finishOperation()
             return
         }
         
         // 切换到主线程执行 commandBlock
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            
+            self.lock.lock()
+            defer { self.lock.unlock() }
+            
+            if self.isCancelled {
+                self.finishOperation()
+                return
+            }
             
             // 安全检查
             guard let block = self.commandBlock else {
@@ -128,42 +158,85 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     }
     
     private func startReceiveTimer() {
-        receiveTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
-        receiveTimer?.schedule(deadline: .now(), repeating: 0.1, leeway: .nanoseconds(0))
+        lock.lock()
+        defer { lock.unlock() }
+        
+        guard !timerStarted, !timeout, !isCancelled else {
+            return
+        }
+        
+        timerStarted = true
+        receiveTimerCount = 0
+        
+        receiveTimer = DispatchSource.makeTimerSource(queue: timerQueue)
+        receiveTimer?.schedule(deadline: .now() + 5.0) // 5秒超时
         
         receiveTimer?.setEventHandler { [weak self] in
             guard let self = self else { return }
-            
-            if self.timeout || self.receiveTimerCount >= 50 {
-                self.receiveTimerCount = 0
-                self.communicationTimeout()
-                return
-            }
-            self.receiveTimerCount += 1
+            self.communicationTimeout()
         }
         
-        if isCancelled {
-            return
+        receiveTimer?.setCancelHandler { [weak self] in
+            guard let self = self else { return }
+            self.lock.lock()
+            defer { self.lock.unlock() }
+            self.timerStarted = false
         }
         
         receiveTimer?.resume()
     }
     
+    private func stopReceiveTimer() {
+        lock.lock()
+        defer { lock.unlock() }
+        
+        receiveTimer?.cancel()
+        receiveTimer = nil
+        timerStarted = false
+    }
+    
     private func finishOperation() {
+        lock.lock()
+        defer { lock.unlock() }
+        
+        if _finished {
+            return
+        }
+        
+        stopReceiveTimer()
+        
         _executing = false
         _finished = true
+        
+        // 清理 block 防止循环引用
+        commandBlock = nil
+        completeBlock = nil
     }
     
     private func communicationTimeout() {
+        lock.lock()
+        defer { lock.unlock() }
+        
+        guard !timeout else { return }
         timeout = true
-        receiveTimer?.cancel()
-        receiveTimer = nil
+        
+        stopReceiveTimer()
+        
+        // 保存 block 引用并在主线程执行
+        let block = completeBlock
+        completeBlock = nil // 防止重复调用
+        
         finishOperation()
         
-        completeBlock?(BXPSOperationError.timeout, nil)
+        DispatchQueue.main.async {
+            block?(BXPSOperationError.timeout, nil)
+        }
     }
     
     private func dataParserReceivedData(_ dataDic: [String: Any]?) {
+        lock.lock()
+        defer { lock.unlock() }
+        
         guard !isCancelled,
               _executing,
               !timeout,
@@ -196,17 +269,33 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
             }
             
             if dataList.count == Int(totalNum) {
-                receiveTimer?.cancel()
-                receiveTimer = nil
+                stopReceiveTimer()
+                
+                // 创建 Sendable 结果
+                let result = MKSwiftBleResult(value: ["result": dataList])
+                let block = completeBlock
+                completeBlock = nil
+                
                 finishOperation()
-                completeBlock?(nil, ["result":dataList])
+                
+                DispatchQueue.main.async {
+                    block?(nil, result)
+                }
             }
             return
         }
         
-        receiveTimer?.cancel()
-        receiveTimer = nil
+        stopReceiveTimer()
+        
+        // 创建 Sendable 结果
+        let result = MKSwiftBleResult(value: returnData)
+        let block = completeBlock
+        completeBlock = nil
+        
         finishOperation()
-        completeBlock?(nil, returnData)
+        
+        DispatchQueue.main.async {
+            block?(nil, result)
+        }
     }
 }

@@ -230,7 +230,7 @@ enum BXPSCentralManagerError: LocalizedError {
                     return
                 }
                 
-                continuation.resume(returning: MKSwiftBleResult(value: returnData))
+                continuation.resume(returning: returnData)
             }
             
             // 添加操作到队列
@@ -265,7 +265,7 @@ enum BXPSCentralManagerError: LocalizedError {
                     return
                 }
                 
-                continuation.resume(returning: MKSwiftBleResult(value: returnData))
+                continuation.resume(returning: returnData)
             }
             
             // 添加操作到队列
