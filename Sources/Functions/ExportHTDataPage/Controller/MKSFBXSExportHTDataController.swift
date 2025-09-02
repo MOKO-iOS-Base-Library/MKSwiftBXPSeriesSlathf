@@ -68,7 +68,7 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         cancelTimer()
         
         // 使用 Timer 而不是 DispatchSourceTimer
-        parseTimer = Timer.scheduledTimer(timeInterval: 0.3,
+        parseTimer = Timer.scheduledTimer(timeInterval: 0.05,
                                          target: self,
                                          selector: #selector(parseTimerFired),
                                          userInfo: nil,

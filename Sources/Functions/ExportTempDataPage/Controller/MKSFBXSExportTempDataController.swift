@@ -184,7 +184,7 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
     
     private func startParseTimer() {
         parseTimer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
-        parseTimer?.schedule(deadline: .now(), repeating: 0.3)
+        parseTimer?.schedule(deadline: .now(), repeating: 0.05)
         
         parseTimer?.setEventHandler { [weak self] in
             guard let self = self else { return }
