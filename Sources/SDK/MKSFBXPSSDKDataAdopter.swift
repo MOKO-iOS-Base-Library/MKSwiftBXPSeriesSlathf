@@ -339,7 +339,7 @@ public class MKSwiftBXPSSDKDataAdopter {
         
         let slotType = MKSwiftBleSDKAdopter.hexStringFromData(content.subdata(in: contentIndex..<(contentIndex + 1)))
         resultDic["slotType"] = slotType
-        contentIndex += 2
+        contentIndex += 1
         
         // 解析广告内容
         var advDic = [String: Any]()
