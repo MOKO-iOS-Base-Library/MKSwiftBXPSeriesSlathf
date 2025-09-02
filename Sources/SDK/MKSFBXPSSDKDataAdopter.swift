@@ -306,7 +306,7 @@ public class MKSwiftBXPSSDKDataAdopter {
         var resultDic = [String: Any]()
         var contentIndex = 0
         
-        let slotIndex = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 1))
+        let slotIndex = MKSwiftBleSDKAdopter.hexStringFromData(content.subdata(in: contentIndex..<(contentIndex + 1)))
         resultDic["slotIndex"] = slotIndex
         contentIndex += 1
         
@@ -425,10 +425,10 @@ public class MKSwiftBXPSSDKDataAdopter {
     public static func parseSlotTriggerParam(_ content: Data) -> [String: Any] {
         guard content.count >= 2 else { return [:] }
         var contentIndex = 0
-        let slotIndex = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 1))
+        let slotIndex = MKSwiftBleSDKAdopter.hexStringFromData(content.subdata(in: contentIndex..<(contentIndex + 1)))
         contentIndex += 1
         
-        let triggerType = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 1))
+        let triggerType = MKSwiftBleSDKAdopter.hexStringFromData(content.subdata(in: contentIndex..<(contentIndex + 1)))
         contentIndex += 1
         
         if triggerType == "00" {
