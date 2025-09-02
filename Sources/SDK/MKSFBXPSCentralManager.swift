@@ -144,7 +144,7 @@ enum BXPSCentralManagerError: LocalizedError {
         MKSwiftBleBaseCentralManager.shared.stopScan()
     }
     
-    public func readNeedPassword(with peripheral: CBPeripheral) async throws -> String {
+    public func readNeedPassword(with peripheral: CBPeripheral) async throws -> UInt8 {
         do {
             if readingNeedPassword {
                 throw BXPSCentralManagerError.deviceBusyError
@@ -174,7 +174,12 @@ enum BXPSCentralManagerError: LocalizedError {
             _ = try await MKSwiftBleBaseCentralManager.shared.connectDevice(bxsPeripheral)
             if let password = password {
                 //需要连接密码
-                _ = try await sendPasswordToDevice(password: password)
+                let success = try await sendPasswordToDevice(password: password)
+                if success == false {
+                    //密码错误
+                    MKSwiftBleBaseCentralManager.shared.disconnect()
+                    throw BXPSCentralManagerError.passwordError
+                }
             }
             // 免密登录
             self.connectStatus = .connected
@@ -343,13 +348,13 @@ enum BXPSCentralManagerError: LocalizedError {
         return success
     }
     
-    private func confirmNeedPassword() async throws -> String {
+    private func confirmNeedPassword() async throws -> UInt8 {
         do {
             let commandData = "ea005300"
             
             let result = try await MKSwiftBXPSCentralManager.shared.addTask(with: .taskReadNeedPasswordOperation, characteristic: MKSwiftBXPSCentralManager.shared.peripheral()?.bxs_swf_password, commandData: commandData)
             
-            guard let state = result.value["state"] as? String else {
+            guard let state = result.value["state"] as? UInt8 else {
                 throw BXPSCentralManagerError.requestError
             }
             return state
@@ -462,78 +467,81 @@ extension MKSwiftBXPSCentralManager: MKSwiftBleCentralManagerProtocol {
         switch characteristic.uuid.uuidString {
         case "AA02":
             // 设备断开连接的类型
-            let content = MKSwiftBleSDKAdopter.hexStringFromData(characteristic.value!)
-            let type = content.bleSubstring(from: 8, length: 2)
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .mk_bxs_swf_deviceDisconnectType,
-                    object: nil,
-                    userInfo: ["type": type]
-                )
+            if characteristic.value?.count == 5 {
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(
+                        name: .mk_bxs_swf_deviceDisconnectType,
+                        object: nil,
+                        userInfo: ["type": characteristic.value![4]]
+                    )
+                }
             }
             
         case "AA03":
             // 三轴数据
-            let content = MKSwiftBleSDKAdopter.hexStringFromData(characteristic.value!)
-            let xData = MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: 8, length: 4))
-            let yData = MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: 12, length: 4))
-            let zData = MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: 16, length: 4))
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .mk_bxs_swf_receiveThreeAxisData,
-                    object: nil,
-                    userInfo: [
-                        "xData": String(xData.intValue),
-                        "yData": String(yData.intValue),
-                        "zData": String(zData.intValue)
-                    ]
-                )
+            if characteristic.value?.count == 10 {
+                let xData = MKSwiftBleSDKAdopter.signedDataTurnToInt(characteristic.value!.subdata(in: 4..<6))
+                let yData = MKSwiftBleSDKAdopter.signedDataTurnToInt(characteristic.value!.subdata(in: 6..<8))
+                let zData = MKSwiftBleSDKAdopter.signedDataTurnToInt(characteristic.value!.subdata(in: 8..<10))
+                
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(
+                        name: .mk_bxs_swf_receiveThreeAxisData,
+                        object: nil,
+                        userInfo: [
+                            "xData": "\(xData)",
+                            "yData": "\(yData)",
+                            "zData": "\(zData)"
+                        ]
+                    )
+                }
             }
             
         case "AA08":
             // 霍尔传感器状态
-            let content = MKSwiftBleSDKAdopter.hexStringFromData(characteristic.value!)
-            let moved = content.bleSubstring(from: 8, length: 2) == "01"
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .mk_bxs_swf_receiveHallSensorStatusChanged,
-                    object: nil,
-                    userInfo: ["moved": moved]
-                )
+            if characteristic.value?.count == 5 {
+                let moved = characteristic.value![4] == 0x01
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(
+                        name: .mk_bxs_swf_receiveHallSensorStatusChanged,
+                        object: nil,
+                        userInfo: ["moved": moved]
+                    )
+                }
             }
             
         case "AA06":
             // 温湿度数据
-            let content = MKSwiftBleSDKAdopter.hexStringFromData(characteristic.value!)
-            let tempTemp = MKSwiftBleSDKAdopter.signedHexTurnString((content.bleSubstring(from: 8, length: 4))).intValue
-            let tempHui = MKSwiftBleSDKAdopter.getDecimalWithHex(content, range: NSRange(location: 12, length: 4))
-            
-            let temperature = String(format: "%.1f", Double(tempTemp) * 0.1)
-            let humidity = String(format: "%.1f", Double(tempHui) * 0.1)
-            
-            let htData = [
-                "temperature": temperature,
-                "humidity": humidity
-            ]
-            
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .mk_bxs_swf_receiveHTData,
-                    object: nil,
-                    userInfo: htData
-                )
+            if characteristic.value?.count == 8 {
+                let tempTemp = MKSwiftBleSDKAdopter.signedDataTurnToInt(characteristic.value!.subdata(in: 4..<6))
+                
+                let tempHui = MKSwiftBleSDKAdopter.getDecimalFromData(characteristic.value!, range: 6..<8)
+                
+                let temperature = String(format: "%.1f", Double(tempTemp) * 0.1)
+                let humidity = String(format: "%.1f", Double(tempHui) * 0.1)
+                
+                let htData = [
+                    "temperature": temperature,
+                    "humidity": humidity
+                ]
+                
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(
+                        name: .mk_bxs_swf_receiveHTData,
+                        object: nil,
+                        userInfo: htData
+                    )
+                }
             }
             
         case "AA09":
             // 符合采样条件已储存的温湿度数据
-            let content = MKSwiftBleSDKAdopter.hexStringFromData(characteristic.value!)
-            print(content)
-            
+            print(characteristic.value!)
             DispatchQueue.main.async {
                 NotificationCenter.default.post(
                     name: .mk_bxs_swf_receiveRecordHTData,
                     object: nil,
-                    userInfo: ["content": content]
+                    userInfo: ["content": characteristic.value!]
                 )
             }
             

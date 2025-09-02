@@ -283,63 +283,61 @@ public class MKSwiftBXPSSDKDataAdopter {
         }
     }
     
-    public static func fetchTxPowerValueString(_ content: String) -> String {
+    public static func fetchTxPowerValueString(_ content: Int) -> String {
         switch content {
-        case "06": return "6dBm"
-        case "04": return "4dBm"
-        case "03": return "3dBm"
-        case "00": return "0dBm"
-        case "fc": return "-4dBm"
-        case "f8": return "-8dBm"
-        case "f4": return "-12dBm"
-        case "f0": return "-16dBm"
-        case "ec": return "-20dBm"
+        case 0x06: return "6dBm"
+        case 0x04: return "4dBm"
+        case 0x03: return "3dBm"
+        case 0x00: return "0dBm"
+        case 0xfc: return "-4dBm"
+        case 0xf8: return "-8dBm"
+        case 0xf4: return "-12dBm"
+        case 0xf0: return "-16dBm"
+        case 0xec: return "-20dBm"
         default: return "0dBm"
         }
     }
     
     // MARK: - 解析槽位数据
     
-    public static func parseSlotData(_ content: String, advData: Data, hasStandbyDuration: Bool) -> [String: Any] {
-        guard content.count >= 4, advData.count >= 6 else { return [:] }
+    public static func parseSlotData(_ content: Data, hasStandbyDuration: Bool) -> [String: Any] {
+        guard content.count >= 3 else { return [:] }
         
         var resultDic = [String: Any]()
         var contentIndex = 0
-        var dataIndex = hasStandbyDuration ? 14 : 12
         
-        // 槽位索引
-        let slotIndex = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 2))
+        let slotIndex = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 1))
         resultDic["slotIndex"] = slotIndex
-        contentIndex += 2
+        contentIndex += 1
         
         // 广播间隔
-        let advInterval = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 4))
+        let advInterval = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 2))
         resultDic["advInterval"] = advInterval
-        contentIndex += 4
+        contentIndex += 2
         
         // 广播持续时间
-        let advDuration = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 4))
+        let advDuration = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 2))
         resultDic["advDuration"] = advDuration
-        contentIndex += 4
+        contentIndex += 2
         
         // 待机持续时间
         if hasStandbyDuration {
-            let standbyDuration = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 4))
+            let standbyDuration = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 2))
             resultDic["standbyDuration"] = standbyDuration
-            contentIndex += 4
+            contentIndex += 2
         }
         
         // RSSI
-        let rssi = MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: contentIndex, length: 2)).stringValue
-        resultDic["rssi"] = rssi
-        contentIndex += 2
+        let rssi = MKSwiftBleSDKAdopter.signedDataTurnToInt(content.subdata(in: contentIndex..<(contentIndex + 1)))
+        resultDic["rssi"] = "\(rssi)"
+        contentIndex += 1
         
         // 发射功率
-        let txPower = fetchTxPowerValueString(content.bleSubstring(from: contentIndex, length: 2))
+        let txPower = fetchTxPowerValueString(Int(content[contentIndex]))
         resultDic["txPower"] = txPower
-        contentIndex += 2
+        contentIndex += 1
         
-        let slotType = content.bleSubstring(from: contentIndex, length: 2)
+        let slotType = MKSwiftBleSDKAdopter.hexStringFromData(content.subdata(in: contentIndex..<(contentIndex + 1)))
         resultDic["slotType"] = slotType
         contentIndex += 2
         
@@ -351,21 +349,21 @@ public class MKSwiftBXPSSDKDataAdopter {
             break // No Data
         case "00":
             // UID
-            let namespaceID = content.bleSubstring(from: contentIndex, length: 20)
-            contentIndex += 20
-            let instanceID = content.bleSubstring(from: contentIndex, length: 12)
-            contentIndex += 12
+            let namespaceID = MKSwiftBleSDKAdopter.hexStringFromData(content.subdata(in: contentIndex..<(contentIndex + 10)))
+            contentIndex += 10
+            let instanceID = MKSwiftBleSDKAdopter.hexStringFromData(content.subdata(in: contentIndex..<(contentIndex + 6)))
+            contentIndex += 6
             advDic = [
                 "namespaceID": namespaceID,
                 "instanceID": instanceID
             ]
         case "10":
             // URL
-            let urlType = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 2))
-            contentIndex += 2
-            dataIndex += 1
+            let urlType = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 1))
             
-            let subData = advData.subdata(in: dataIndex..<advData.count)
+            contentIndex += 1
+            
+            let subData = content.subdata(in: contentIndex..<content.count)
             var urlContent = ""
             
             subData.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) in
@@ -379,19 +377,18 @@ public class MKSwiftBXPSSDKDataAdopter {
             advDic = [
                 "urlType": urlType,
                 "urlContent": urlContent,
-                "advData": advData
             ]
         case "20":
             // TLM
             break
         case "50":
             // iBeacon
-            let uuid = content.bleSubstring(from: contentIndex, length: 32)
-            contentIndex += 32
-            let major = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 4))
-            contentIndex += 4
-            let minor = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 4))
-            contentIndex += 4
+            let uuid = MKSwiftBleSDKAdopter.hexStringFromData(content.subdata(in: contentIndex..<(contentIndex + 16)))
+            contentIndex += 16
+            let major = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 2))
+            contentIndex += 2
+            let minor = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 2))
+            contentIndex += 2
             
             advDic = [
                 "major": major,
@@ -400,18 +397,16 @@ public class MKSwiftBXPSSDKDataAdopter {
             ]
         case "80":
             // Sensor Info
-            let nameLen = MKSwiftBleSDKAdopter.getDecimalWithHex(content, range: NSRange(location: contentIndex, length: 2))
-            contentIndex += 2
-            dataIndex += 1
+            let nameLen = Int(content[contentIndex])
+            contentIndex += 1
             
-            let nameData = advData.subdata(in: dataIndex..<(dataIndex + nameLen))
+            let nameData = content.subdata(in: contentIndex..<(contentIndex + nameLen))
             let deviceName = String(data: nameData, encoding: .utf8) ?? ""
-            contentIndex += (nameLen * 2)
-            dataIndex += nameLen
+            contentIndex += nameLen
             
-            let tagLen = MKSwiftBleSDKAdopter.getDecimalWithHex(content, range: NSRange(location: contentIndex, length: 2))
-            contentIndex += 2
-            let tagID = content.bleSubstring(from: contentIndex, length: tagLen * 2)
+            let tagLen = Int(content[contentIndex])
+            contentIndex += 1
+            let tagID = MKSwiftBleSDKAdopter.hexStringFromData(content.subdata(in: contentIndex..<(contentIndex + tagLen)))
             
             advDic = [
                 "deviceName": deviceName,
@@ -427,14 +422,14 @@ public class MKSwiftBXPSSDKDataAdopter {
     
     // MARK: - 解析槽位触发参数
     
-    public static func parseSlotTriggerParam(_ content: String) -> [String: Any] {
-        guard content.count >= 4 else { return [:] }
+    public static func parseSlotTriggerParam(_ content: Data) -> [String: Any] {
+        guard content.count >= 2 else { return [:] }
         var contentIndex = 0
-        let slotIndex = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 2))
-        contentIndex += 2
+        let slotIndex = "\(content[contentIndex])"
+        contentIndex += 1
         
-        let triggerType = content.bleSubstring(from: contentIndex, length: 2)
-        contentIndex += 2
+        let triggerType = "\(content[contentIndex])"
+        contentIndex += 1
         
         if triggerType == "00" {
             // 无触发
@@ -445,11 +440,11 @@ public class MKSwiftBXPSSDKDataAdopter {
         }
         if triggerType == "01" {
             // 温度触发
-            let event = (content.bleSubstring(from: contentIndex, length: 2) == "10") ? "0" : "1"
+            let event = (content[contentIndex] == 0x10) ? "0" : "1"
+            contentIndex += 1
+            let temperature = MKSwiftBleSDKAdopter.signedDataTurnToInt(content.subdata(in: contentIndex..<(contentIndex + 2)))
             contentIndex += 2
-            let temperature = MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: contentIndex, length: 4)).stringValue
-            contentIndex += 4
-            let lockedAdv = content.bleSubstring(from: contentIndex, length: 2) == "01"
+            let lockedAdv = content[contentIndex] == 0x01
             
             return [
                 "slotIndex": slotIndex,
@@ -461,11 +456,11 @@ public class MKSwiftBXPSSDKDataAdopter {
         }
         if triggerType == "02" {
             // 湿度触发
-            let event = (content.bleSubstring(from: contentIndex, length: 2) == "20") ? "0" : "1"
+            let event = (content[contentIndex] == 0x20) ? "0" : "1"
+            contentIndex += 1
+            let humidity = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 2))
             contentIndex += 2
-            let humidity = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 4))
-            contentIndex += 4
-            let lockedAdv = content.bleSubstring(from: contentIndex, length: 2) == "01"
+            let lockedAdv = content[contentIndex] == 0x01
             
             return [
                 "slotIndex": slotIndex,
@@ -477,12 +472,12 @@ public class MKSwiftBXPSSDKDataAdopter {
         }
         if triggerType == "03" {
             // 移动触发
-            let event = (content.bleSubstring(from: contentIndex, length: 2) == "30") ? "0" : "1"
+            let event = (content[contentIndex] == 0x30) ? "0" : "1"
+            contentIndex += 1
             contentIndex += 2
-            contentIndex += 4
-            let lockedAdv = content.bleSubstring(from: contentIndex, length: 2) == "01"
-            contentIndex += 2
-            let period = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: contentIndex, length: 4))
+            let lockedAdv = content[contentIndex] == 0x01
+            contentIndex += 1
+            let period = MKSwiftBleSDKAdopter.getDecimalStringFromData(content, range: contentIndex..<(contentIndex + 2))
             
             return [
                 "slotIndex": slotIndex,
@@ -494,10 +489,10 @@ public class MKSwiftBXPSSDKDataAdopter {
         }
         if triggerType == "04" {
             // 霍尔触发
-            let event = (content.bleSubstring(from: contentIndex, length: 2) == "40") ? "0" : "1"
+            let event = (content[contentIndex] == 0x40) ? "0" : "1"
+            contentIndex += 1
             contentIndex += 2
-            contentIndex += 4
-            let lockedAdv = content.bleSubstring(from: contentIndex, length: 2) == "01"
+            let lockedAdv = content[contentIndex] == 0x01
             
             return [
                 "slotIndex": slotIndex,
@@ -536,41 +531,6 @@ public class MKSwiftBXPSSDKDataAdopter {
                 ]
                 tempList.append(dic)
             }
-        }
-        
-        return tempList
-    }
-    
-    // MARK: - 解析温湿度数据
-    
-    public static func parseTemperatureHumidityData(_ content: String) -> [[String: Any]] {
-        guard !content.isEmpty else { return [] }
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM/yyyy HH:mm:ss"
-        
-        let total = content.count / 16
-        var tempList = [[String: Any]]()
-        
-        for i in 0..<total {
-            let subContent = content.bleSubstring(from: i * 16, length: 16)
-            
-            let time = MKSwiftBleSDKAdopter.getDecimalWithHex(subContent, range: NSRange(location: 0, length: 8))
-            let date = Date(timeIntervalSince1970: TimeInterval(time))
-            let timestamp = dateFormatter.string(from: date)
-            
-            let tempTemp = MKSwiftBleSDKAdopter.signedHexTurnString((subContent.bleSubstring(from: 8, length: 4))).intValue
-            let tempHui = MKSwiftBleSDKAdopter.getDecimalWithHex(subContent, range: NSRange(location: 12, length: 4))
-            
-            let temperature = String(format: "%.1f", Double(tempTemp) * 0.1)
-            let humidity = String(format: "%.1f", Double(tempHui) * 0.1)
-            
-            let htData: [String: Any] = [
-                "temperature": temperature,
-                "humidity": humidity,
-                "date": timestamp
-            ]
-            tempList.append(htData)
         }
         
         return tempList

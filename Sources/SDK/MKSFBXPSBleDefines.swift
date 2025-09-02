@@ -243,10 +243,12 @@ public class MKSFBXSSensorInfoBeacon: MKSFBXSBaseBeacon, @unchecked Sendable {
         super.init()
         if advData.count < 16 { return nil }
         
-        var content = MKSwiftBleSDKAdopter.hexStringFromData(advData)
-        content = content.bleSubstring(from: 2, length: (content.count - 2))
-        let state = content.bleSubstring(from: 0, length: 2)
+//        var content = MKSwiftBleSDKAdopter.hexStringFromData(advData)
+//        content = content.bleSubstring(from: 2, length: (content.count - 2))
+        var index = 1
+        let state = MKSwiftBleSDKAdopter.hexStringFromData(advData.subdata(in: index..<(index + 1)))
         let binary = MKSwiftBleSDKAdopter.binaryByhex(state)
+        index += 1
         
         magnetStatus = (binary.bleSubstring(from: 7, length: 1) == "1")
         moved = (binary.bleSubstring(from: 6, length: 1) == "1")
@@ -255,21 +257,36 @@ public class MKSFBXSSensorInfoBeacon: MKSFBXSBaseBeacon, @unchecked Sendable {
         humiditySensor = (binary.bleSubstring(from: 3, length: 1) == "1")
         flash = (binary.bleSubstring(from: 2, length: 1) == "1")
         
-        hallSensorCount = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: 2, length: 4))
-        movedCount = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: 6, length: 4))
+        hallSensorCount = MKSwiftBleSDKAdopter.getDecimalStringFromData(advData, range: index..<(index + 2))
+        index += 2
         
-        xData = String(describing: MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: 10, length: 4)))
-        yData = String(describing: MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: 14, length: 4)))
-        zData = String(describing: MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: 18, length: 4)))
+        movedCount = MKSwiftBleSDKAdopter.getDecimalStringFromData(advData, range: index..<(index + 2))
+        index += 2
         
-        let tempNumber = MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: 22, length: 4))
-        temperature = String(format: "%.1f", tempNumber.doubleValue * 0.1)
+        let tempXData = MKSwiftBleSDKAdopter.signedDataTurnToInt(advData.subdata(in: index..<(index + 2)))
+        xData = "\(tempXData)"
+        index += 2
         
-        let humidityNumber = MKSwiftBleSDKAdopter.signedHexTurnString(content.bleSubstring(from: 26, length: 4))
-        humidity = String(format: "%.1f", humidityNumber.doubleValue * 0.1)
+        let tempYData = MKSwiftBleSDKAdopter.signedDataTurnToInt(advData.subdata(in: index..<(index + 2)))
+        yData = "\(tempYData)"
+        index += 2
         
-        battery = MKSwiftBleSDKAdopter.getDecimalStringWithHex(content, range: NSRange(location: 30, length: 4))
-        tagID = String(content.dropFirst(34))
+        let tempZData = MKSwiftBleSDKAdopter.signedDataTurnToInt(advData.subdata(in: index..<(index + 2)))
+        zData = "\(tempZData)"
+        index += 2
+        
+        let tempNumber = MKSwiftBleSDKAdopter.signedDataTurnToInt(advData.subdata(in: index..<(index + 2)))
+        temperature = String(format: "%.1f", Double(tempNumber) * 0.1)
+        index += 2
+        
+        let humidityNumber = MKSwiftBleSDKAdopter.getDecimalFromData(advData, range: index..<(index + 2))
+        humidity = String(format: "%.1f", Double(humidityNumber) * 0.1)
+        index += 2
+        
+        battery = MKSwiftBleSDKAdopter.getDecimalStringFromData(advData, range: index..<(index + 2))
+        index += 2
+        
+        tagID = MKSwiftBleSDKAdopter.hexStringFromData(advData.subdata(in: index..<advData.count))
     }
 }
 

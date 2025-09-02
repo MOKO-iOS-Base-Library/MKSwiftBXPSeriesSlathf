@@ -23,12 +23,12 @@ import CoreBluetooth
         return macAddress
     }
     
-    static func readThreeAxisDataParams() async throws -> (samplingRate: String, gravityReference: String, motionThreshold: String) {
+    static func readThreeAxisDataParams() async throws -> (samplingRate: Int, gravityReference: Int, motionThreshold: Int) {
         let result = try await readData(taskID: .taskReadThreeAxisDataParamsOperation, cmdFlag: "21")
         
-        guard let samplingRate = result.value["samplingRate"] as? String,
-              let gravityReference = result.value["gravityReference"] as? String,
-              let motionThreshold = result.value["motionThreshold"] as? String else {
+        guard let samplingRate = result.value["samplingRate"] as? Int,
+              let gravityReference = result.value["gravityReference"] as? Int,
+              let motionThreshold = result.value["motionThreshold"] as? Int else {
             throw MKSwiftBleError.paramsError
         }
         

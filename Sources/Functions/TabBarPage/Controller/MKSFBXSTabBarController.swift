@@ -93,16 +93,16 @@ class MKSFBXSTabBarController: UITabBarController {
     }
     
     @objc private func disconnectTypeNotification(_ notification: Notification) {
-        guard let type = notification.userInfo?["type"] as? String else { return }
+        guard let type = notification.userInfo?["type"] as? Int else { return }
         
         disconnectType = true
         
         switch type {
-        case "02":
+        case 2:
             showAlert(with: "Modify password success! Please reconnect the Device.", title: " ")
-        case "03":
+        case 3:
             showAlert(with: "Beacon is disconnected.", title: "Reset success!")
-        case "04":
+        case 4:
             gotoScanPage()
         default:
             break

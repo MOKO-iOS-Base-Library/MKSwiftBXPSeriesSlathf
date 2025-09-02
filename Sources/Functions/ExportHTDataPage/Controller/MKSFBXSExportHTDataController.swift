@@ -30,7 +30,7 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     private var temperatureList = [String]()
     private var humidityList = [String]()
     private var dataList = [[String: String]]()
-    private var contentList = [String]()
+    private var contentList = [Data]()
     private var textMsg = ""
     private var totalCount = 0
     private var parseIndex = 0
@@ -128,15 +128,14 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     }
     
     // MARK: - Data Processing
-    private func parseTemperatureHumidityData(_ content: String) -> String {
-        let total = content.count / 16
+    private func parseTemperatureHumidityData(_ content: Data) -> String {
+        let total = content.count / 8
         var text = ""
         
         for i in 0..<total {
-            let subContent = content.substring(from: i * 16, length: 16)
+            let subContent = content.subdata(in: i * 8..<(i * 8 + 8))
             
-            let timeStr = String(subContent.prefix(8))
-            let time = strtoul(timeStr, nil, 16)
+            let time = MKSwiftBleSDKAdopter.getDecimalFromData(subContent, range: 0..<4)
             
             let timestamp: String
             if time < 1577808000 {
@@ -149,11 +148,11 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
                 timestamp = dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(time)))
             }
             
-            let tempTemp = MKSwiftBleSDKAdopter.signedHexTurnString(subContent.substring(from: 8, length: 4))
+            let tempTemp = MKSwiftBleSDKAdopter.signedDataTurnToInt(subContent.subdata(in: 4..<6))
             
-            let tempHui = MKSwiftBleSDKAdopter.getDecimalWithHex(subContent, range: NSRange(location: 12, length: 4))
+            let tempHui = MKSwiftBleSDKAdopter.getDecimalFromData(subContent, range: 6..<8)
             
-            let temperature = String(format: "%.1f", tempTemp.doubleValue * 0.1)
+            let temperature = String(format: "%.1f", Double(tempTemp) * 0.1)
             let humidity = String(format: "%.1f", Double(tempHui) * 0.1)
             
             let tempTemperature = "\(temperature)℃"
@@ -182,7 +181,7 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
         }
         
         let content = contentList[parseIndex]
-        let text = parseTemperatureHumidityData(String(content.dropFirst(16)))
+        let text = parseTemperatureHumidityData(content.subdata(in: 8..<content.count))
         
         textMsg = text + textMsg
         maskView.updateCurrentNumber("\(dataList.count)")
@@ -371,12 +370,12 @@ class MKSFBXSExportHTDataController: MKSwiftBaseViewController {
     
     @objc private func receiveRecordHTData(_ note: Notification) {
         guard let userInfo = note.userInfo,
-              let content = userInfo["content"] as? String else {
+              let content = userInfo["content"] as? Data else {
             return
         }
         
-        let total = MKSwiftBleSDKAdopter.getDecimalWithHex(content, range: NSRange(location: 6, length: 4))
-        let index = MKSwiftBleSDKAdopter.getDecimalWithHex(content, range: NSRange(location: 10, length: 4))
+        let total = MKSwiftBleSDKAdopter.getDecimalFromData(content, range: 3..<5)
+        let index = MKSwiftBleSDKAdopter.getDecimalFromData(content, range: 5..<7)
         
         totalCount = total
         contentList.append(content)

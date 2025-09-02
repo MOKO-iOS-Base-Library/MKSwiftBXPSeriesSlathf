@@ -273,7 +273,7 @@ import MKSwiftBleModule
         do {
             let result = try await MKSwiftBXPSCentralManager.shared.readNeedPassword(with: peripheral)
             MKSwiftHudManager.shared.hide()
-            if result == "00" {
+            if result == 0x00 {
                 await startConnectPeripheral(peripheral, needPassword: false)
             }else {
                 connectDeviceWithPassword(peripheral)

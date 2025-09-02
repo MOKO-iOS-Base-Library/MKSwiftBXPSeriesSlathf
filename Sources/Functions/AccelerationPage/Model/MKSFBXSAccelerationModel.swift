@@ -57,7 +57,7 @@ enum AccelerationModelError: LocalizedError {
         do {
             let result = try await MKSFBXSInterface.readThreeAxisDataParams()
             
-            return (Int(result.gravityReference)!,Int(result.samplingRate)!,result.motionThreshold)
+            return (result.gravityReference,result.samplingRate,String(result.motionThreshold))
         } catch {
             throw error
         }
