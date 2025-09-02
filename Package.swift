@@ -20,10 +20,10 @@ let package = Package(
         .target(
             name: "MKSwiftBXPSeriesSlathf",
             dependencies: [
-                "MKBaseSwiftModule",
-                "MKSwiftBeaconXCustomUI",
-                "MKSwiftBleModule",
-                "DateTimePicker"
+                .product(name: "MKBaseSwiftModule", package: "MKBaseSwiftModule"),
+                .product(name: "MKSwiftBeaconXCustomUI", package: "MKSwiftBeaconXCustomUI"),
+                .product(name: "MKSwiftBleModule", package: "MKSwiftBleModule"),
+                .product(name: "DateTimePicker", package: "DateTimePicker")
             ],
             path: "Sources",
             resources: [.process("Assets")],
