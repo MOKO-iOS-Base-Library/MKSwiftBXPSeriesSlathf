@@ -92,11 +92,25 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     // MARK: - Operation Overrides
     
     override func start() {
+        // 必须在主线程执行 KVO 通知
+        if Thread.isMainThread {
+            startOperation()
+        } else {
+            DispatchQueue.main.async {
+                self.startOperation()
+            }
+        }
+    }
+    
+    private func startOperation() {
         lock.lock()
         
         if isCancelled {
             lock.unlock()
-            finishOperation()
+            // 如果已取消，需要正确设置状态
+            if !_finished {
+                finishOperation()
+            }
             return
         }
         
@@ -105,10 +119,14 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
             return
         }
         
+        // 设置执行状态（这会触发 KVO）
         _executing = true
         lock.unlock()
         
-        startCommunication()
+        // 在后台线程执行实际工作，避免阻塞主线程
+        DispatchQueue.global().async { [weak self] in
+            self?.startCommunication()
+        }
     }
     
     override func cancel() {
@@ -136,14 +154,22 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     private func startCommunication() {
         lock.lock()
         let cancelled = isCancelled
+        let finished = _finished
         lock.unlock()
         
-        if cancelled {
+        if cancelled || finished {
             finishOperation()
             return
         }
         
-        // 切换到主线程执行 commandBlock
+        // 安全检查
+        guard let block = commandBlock else {
+            print("Error: commandBlock is nil")
+            communicationTimeout()
+            return
+        }
+        
+        // 在主线程执行 commandBlock（通常涉及 UI 或 CoreBluetooth）
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
@@ -153,13 +179,6 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
             
             if cancelled {
                 self.finishOperation()
-                return
-            }
-            
-            // 安全检查
-            guard let block = self.commandBlock else {
-                print("Error: commandBlock is nil")
-                self.communicationTimeout()
                 return
             }
             
@@ -173,7 +192,7 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
         lock.lock()
         defer { lock.unlock() }
         
-        guard !timerStarted, !timeout, !isCancelled else {
+        guard !timerStarted, !timeout, !isCancelled, !_finished else {
             return
         }
         
@@ -217,8 +236,17 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
         
         stopReceiveTimer()
         
-        _executing = false
-        _finished = true
+        // 必须在主线程执行 KVO 通知
+        if Thread.isMainThread {
+            _executing = false
+            _finished = true
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self._executing = false
+                self._finished = true
+            }
+        }
         
         // 清理 block 防止循环引用
         commandBlock = nil
@@ -234,7 +262,7 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
         
         stopReceiveTimer()
         
-        // 保存 block 引用并在主线程执行
+        // 保存 block 引用
         let block = completeBlock
         completeBlock = nil // 防止重复调用
         
