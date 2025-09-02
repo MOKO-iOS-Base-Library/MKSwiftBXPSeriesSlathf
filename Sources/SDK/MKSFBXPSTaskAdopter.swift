@@ -120,9 +120,7 @@ class MKSFBXSTaskAdopter {
         if readData[0] != 0xeb {
             return [:]
         }
-        
-        let dataLen = MKSwiftBleSDKAdopter.getDecimalStringFromData(readData, range: 3..<4)
-        
+                
         let content = readData.subdata(in: 4..<readData.count)
         
         // Non-fragmented protocol
@@ -144,7 +142,7 @@ class MKSFBXSTaskAdopter {
         if cmd == 0x53 {
             // Read if device connection requires password
             operationID = .taskReadNeedPasswordOperation
-            resultDic = ["state": content]
+            resultDic = ["state": content[0]]
         }
         
         return dataParserGetDataSuccess(resultDic, operationID: operationID)
@@ -200,7 +198,7 @@ class MKSFBXSTaskAdopter {
         if cmd == 0x20 {
             // Read MAC address
             operationID = .taskReadMacAddressOperation
-            var tempContent = MKSwiftBleSDKAdopter.hexStringFromData(content)
+            let tempContent = MKSwiftBleSDKAdopter.hexStringFromData(content)
             let macParts = [
                 tempContent.bleSubstring(from: 0, length: 2),
                 tempContent.bleSubstring(from: 2, length: 2),
@@ -273,7 +271,7 @@ class MKSFBXSTaskAdopter {
         } else if cmd == 0x30 {
             // Read broadcast channel type
             operationID = .taskReadSlotTypeOperation
-            var tempContent = MKSwiftBleSDKAdopter.hexStringFromData(content)
+            let tempContent = MKSwiftBleSDKAdopter.hexStringFromData(content)
             let slot1 = tempContent.bleSubstring(from: 0, length: 2)
             let slot2 = tempContent.bleSubstring(from: 2, length: 2)
             let slot3 = tempContent.bleSubstring(from: 4, length: 2)
@@ -433,7 +431,7 @@ class MKSFBXSTaskAdopter {
             // Read all channel broadcast types
             operationID = .taskReadSlotAdvTypeOperation
             var typeList: [String] = []
-            var tempContent = MKSwiftBleSDKAdopter.hexStringFromData(content)
+            let tempContent = MKSwiftBleSDKAdopter.hexStringFromData(content)
             for i in 0..<6 {
                 typeList.append(tempContent.bleSubstring(from: (i * 2), length: 2))
             }
@@ -548,9 +546,7 @@ class MKSFBXSTaskAdopter {
         if readData[0] != 0xeb {
             return [:]
         }
-        
-        let dataLen = MKSwiftBleSDKAdopter.getDecimalStringFromData(readData, range: 3..<4)
-        
+                
         let content = readData.subdata(in: 4..<readData.count)
         
         // Non-fragmented protocol
