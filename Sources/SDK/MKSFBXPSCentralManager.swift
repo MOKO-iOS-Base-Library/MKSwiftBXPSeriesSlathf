@@ -158,6 +158,7 @@ enum BXPSCentralManagerError: LocalizedError {
             return state
         } catch {
             readingNeedPassword = false
+            MKSwiftBleBaseCentralManager.shared.disconnect()
             throw error
         }
     }
