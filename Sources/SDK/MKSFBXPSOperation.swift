@@ -93,14 +93,21 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     
     override func start() {
         lock.lock()
-        defer { lock.unlock() }
         
-        if isFinished || isCancelled {
+        if isCancelled {
+            lock.unlock()
             finishOperation()
             return
         }
         
+        if _finished {
+            lock.unlock()
+            return
+        }
+        
         _executing = true
+        lock.unlock()
+        
         startCommunication()
     }
     
@@ -127,7 +134,11 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
     // MARK: - Private Methods
     
     private func startCommunication() {
-        if isCancelled {
+        lock.lock()
+        let cancelled = isCancelled
+        lock.unlock()
+        
+        if cancelled {
             finishOperation()
             return
         }
@@ -137,9 +148,10 @@ class MKSwiftBXPSOperation: Operation, MKSwiftBleOperationProtocol, @unchecked S
             guard let self = self else { return }
             
             self.lock.lock()
-            defer { self.lock.unlock() }
+            let cancelled = self.isCancelled
+            self.lock.unlock()
             
-            if self.isCancelled {
+            if cancelled {
                 self.finishOperation()
                 return
             }
