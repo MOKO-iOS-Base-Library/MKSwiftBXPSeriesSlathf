@@ -54,9 +54,7 @@ class MKSFBXSTaskAdopter {
         if readData[0] != 0xeb {
             return [:]
         }
-        
-        let dataLen = MKSwiftBleSDKAdopter.getDecimalStringFromData(readData, range: 3..<4)
-        
+                
         let content = readData.subdata(in: 4..<readData.count)
         
         // Non-fragmented protocol
