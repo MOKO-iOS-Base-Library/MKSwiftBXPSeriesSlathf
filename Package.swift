@@ -8,7 +8,7 @@ let package = Package(
         .library(
             name: "MKSwiftBXPSeriesSlathf",
             // 明确指定为动态库，并要求库演进
-            type: .dynamic,
+            type: .static,
             targets: ["MKSwiftBXPSeriesSlathf"]
         ),
     ],
@@ -32,9 +32,6 @@ let package = Package(
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),
                 .define("IOS14_OR_LATER"),
-                .enableUpcomingFeature("LibraryEvolution"),
-                // 或者使用这个（根据Swift版本选择）
-                .enableExperimentalFeature("BuildServerLibraryEvolution")
             ],
             linkerSettings: [
                 .linkedLibrary("z"),
