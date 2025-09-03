@@ -28,7 +28,12 @@ let package = Package(
             path: "Sources",
             resources: [.process("Assets")],
             swiftSettings: [
-                .define("DEBUG", .when(configuration: .debug))
+                .define("DEBUG", .when(configuration: .debug)),
+                .define("IOS14_OR_LATER")
+            ],
+            linkerSettings: [
+                .linkedLibrary("z"),
+                .linkedLibrary("iconv")
             ]
         ),
         .testTarget(
