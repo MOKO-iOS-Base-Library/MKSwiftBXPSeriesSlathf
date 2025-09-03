@@ -32,9 +32,6 @@ let package = Package(
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),
                 .define("IOS14_OR_LATER"),
-                // 【核心解决方案】启用库演进支持
-                .enableExperimentalFeature("LibraryEvolution"),
-                .unsafeFlags(["-enable-library-evolution"])
             ],
             linkerSettings: [
                 .linkedLibrary("z"),
