@@ -13,6 +13,7 @@ import SnapKit
 import MKBaseSwiftModule
 import MKSwiftCustomUI
 import MKSwiftBeaconXCustomUI
+import MKSwiftUILibrary
 import MKSwiftBleModule
 
 @objc public enum BXSScanType: Int {
@@ -77,7 +78,7 @@ import MKSwiftBleModule
     
     //MARK: - Super Methods
     @objc public override func rightButtonMethod() {
-        let vc = MKSFBXSAboutController()
+        let vc = MKSFUAdapter.toController(MKSFUBXSAboutView())
         navigationController?.pushViewController(vc, animated: true)
     }
     
