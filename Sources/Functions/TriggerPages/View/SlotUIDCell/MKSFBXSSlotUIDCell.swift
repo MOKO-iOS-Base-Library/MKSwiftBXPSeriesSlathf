@@ -7,8 +7,11 @@
 
 // MKSFBXSSlotUIDCell.swift
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 // MARK: - Models and Protocols
 
@@ -166,8 +169,8 @@ class MKSFBXSSlotUIDCell: MKSwiftBaseCell {
     
     private lazy var hexNameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
-        label.font = Font.MKFont(12.0)
+        label.textColor = MKColor.defaultText
+        label.font = MKFont.font(12.0)
         label.textAlignment = .right
         label.text = "0x"
         return label
@@ -188,8 +191,8 @@ class MKSFBXSSlotUIDCell: MKSwiftBaseCell {
     
     private lazy var hexInstanceLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
-        label.font = Font.MKFont(12.0)
+        label.textColor = MKColor.defaultText
+        label.font = MKFont.font(12.0)
         label.textAlignment = .right
         label.text = "0x"
         return label

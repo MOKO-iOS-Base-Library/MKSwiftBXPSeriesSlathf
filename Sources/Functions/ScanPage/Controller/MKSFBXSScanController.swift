@@ -7,9 +7,11 @@
 
 import UIKit
 import CoreBluetooth
+
 import SnapKit
 
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 import MKSwiftBeaconXCustomUI
 import MKSwiftBleModule
 
@@ -199,7 +201,7 @@ import MKSwiftBleModule
             return
         }
         
-        if Valid.isStringValid(buttonModel.searchMac) || Valid.isStringValid(buttonModel.searchName) {
+        if MKValid.isStringValid(buttonModel.searchMac) || MKValid.isStringValid(buttonModel.searchName) {
             //如果打开了过滤，先看是否需要过滤设备名字
             //如果是设备信息帧,判断名字是否符合要求
             if beacon.rssi.intValue >= buttonModel.searchRssi {
@@ -374,14 +376,14 @@ import MKSwiftBleModule
     // MARK: - UI Setup
     
     private func setupUI() {
-        view.backgroundColor = Color.rgb(237, 243, 250)
+        view.backgroundColor = MKColor.rgb(237, 243, 250)
         
         rightButton.setImage(moduleIcon(name: "bxs_swf_scanRightAboutIcon", in: .module), for: .normal)
         
         defaultTitle = "DEVICE(0)"
         
         let topView = UIView()
-        topView.backgroundColor = Color.rgb(237, 243, 250)
+        topView.backgroundColor = MKColor.rgb(237, 243, 250)
         view.addSubview(topView)
         
         topView.snp.makeConstraints { make in
@@ -493,7 +495,7 @@ extension MKSFBXSScanController: UITableViewDataSource, UITableViewDelegate {
         let headerView = MKSwiftTableSectionLineHeader.dequeueHeader(with: tableView)
         
         let sectionData = MKSwiftTableSectionLineHeaderModel()
-        sectionData.contentColor = Color.rgb(237, 243, 250)
+        sectionData.contentColor = MKColor.rgb(237, 243, 250)
         headerView.headerModel = sectionData
         return headerView
     }

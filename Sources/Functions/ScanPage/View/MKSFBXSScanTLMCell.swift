@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 import MKSwiftBeaconXCustomUI
 
 class MKSFBXSScanTLMCellModel: MKSwiftBXScanBaseModel {
@@ -32,7 +35,7 @@ class MKSFBXSScanTLMCell: MKSwiftBaseCell {
     private let offsetY: CGFloat = 10
     private let leftIconWidth: CGFloat = 7
     private let leftIconHeight: CGFloat = 7
-    private let msgFont = Font.MKFont(12.0)
+    private let msgFont = MKFont.font(12.0)
     
     // MARK: - Initialization
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -147,7 +150,7 @@ class MKSFBXSScanTLMCell: MKSwiftBaseCell {
     
     private func createLabel(text: String = "") -> UILabel {
         let label = UILabel()
-        label.textColor = Color.rgb(184, 184, 184)
+        label.textColor = MKColor.rgb(184, 184, 184)
         label.textAlignment = .left
         label.font = msgFont
         label.text = text

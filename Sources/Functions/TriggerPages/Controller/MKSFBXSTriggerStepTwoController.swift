@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSTriggerStepTwoController: MKSwiftBaseViewController {
     
@@ -257,7 +260,7 @@ class MKSFBXSTriggerStepTwoController: MKSwiftBaseViewController {
     
     private lazy var tableView: MKSwiftBaseTableView = {
         let tableView = MKSwiftBaseTableView(frame: .zero, style: .plain)
-        tableView.backgroundColor = Color.rgb(242, 242, 242)
+        tableView.backgroundColor = MKColor.rgb(242, 242, 242)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableHeaderView = tableHeaderView
@@ -272,18 +275,18 @@ class MKSFBXSTriggerStepTwoController: MKSwiftBaseViewController {
     }()
     
     private lazy var tableHeaderView: UIView = {
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: Screen.width, height: 90.0))
-        headerView.backgroundColor = Color.rgb(242, 242, 242)
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: MKScreen.width, height: 90.0))
+        headerView.backgroundColor = MKColor.rgb(242, 242, 242)
         
-        let stepLabel = UILabel(frame: CGRect(x: 15, y: 10, width: Screen.width - 30, height: 20))
+        let stepLabel = UILabel(frame: CGRect(x: 15, y: 10, width: MKScreen.width - 30, height: 20))
         stepLabel.textAlignment = .left
-        stepLabel.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["2", "/3", ":", "Event occurs setting"], fonts: [Font.MKFont(15.0),Font.MKFont(13.0),Font.MKFont(13.0),Font.MKFont(18.0)], colors: [Color.navBar,Color.rgb(137, 137, 137),Color.navBar,Color.defaultText])
+        stepLabel.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["2", "/3", ":", "Event occurs setting"], fonts: [MKFont.font(15.0),MKFont.font(13.0),MKFont.font(13.0),MKFont.font(18.0)], colors: [MKColor.navBar,MKColor.rgb(137, 137, 137),MKColor.navBar,MKColor.defaultText])
         headerView.addSubview(stepLabel)
         
-        let noteMsgLabel = UILabel(frame: CGRect(x: 15, y: 40, width: Screen.width - 30, height: 45))
+        let noteMsgLabel = UILabel(frame: CGRect(x: 15, y: 40, width: MKScreen.width - 30, height: 45))
         noteMsgLabel.textAlignment = .left
-        noteMsgLabel.textColor = Color.rgb(204, 102, 72)
-        noteMsgLabel.font = Font.MKFont(13.0)
+        noteMsgLabel.textColor = MKColor.rgb(204, 102, 72)
+        noteMsgLabel.font = MKFont.font(13.0)
         noteMsgLabel.numberOfLines = 0
         noteMsgLabel.text = "*In this step, you can configure the advertising parameters of trigger event occurs."
         headerView.addSubview(noteMsgLabel)
@@ -292,10 +295,10 @@ class MKSFBXSTriggerStepTwoController: MKSwiftBaseViewController {
     }()
     
     private lazy var tableFooterView: UIView = {
-        let footerView = UIView(frame: CGRect(x: 0, y: 0, width: Screen.width, height: 80))
-        footerView.backgroundColor = Color.rgb(242, 242, 242)
+        let footerView = UIView(frame: CGRect(x: 0, y: 0, width: MKScreen.width, height: 80))
+        footerView.backgroundColor = MKColor.rgb(242, 242, 242)
         
-        let btnWidth = (Screen.width - 90) / 2
+        let btnWidth = (MKScreen.width - 90) / 2
                 
         let backBtn = MKSwiftUIAdaptor.createRoundedButton(title: "Back",target: self,action: #selector(leftButtonMethod))
         backBtn.frame = CGRect(x: 30, y: 20, width: btnWidth, height: 40)

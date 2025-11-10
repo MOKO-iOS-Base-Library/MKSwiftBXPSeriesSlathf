@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSHallSensorConfigController: MKSwiftBaseViewController {
     
@@ -59,7 +62,7 @@ class MKSFBXSHallSensorConfigController: MKSwiftBaseViewController {
     // MARK: - Private Methods
     private func setupUI() {
         defaultTitle = "Hall sensor"
-        view.backgroundColor = Color.rgb(242, 242, 242)
+        view.backgroundColor = MKColor.rgb(242, 242, 242)
         
         view.addSubview(headerView)
         headerView.snp.makeConstraints { make in

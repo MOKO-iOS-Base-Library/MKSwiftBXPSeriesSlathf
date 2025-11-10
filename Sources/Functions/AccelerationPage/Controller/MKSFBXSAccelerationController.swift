@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSAccelerationController: MKSwiftBaseViewController {
     
@@ -58,7 +61,7 @@ class MKSFBXSAccelerationController: MKSwiftBaseViewController {
     
     private func loadSubViews() {
         defaultTitle = "3-axis accelerometer"
-        view.backgroundColor = Color.rgb(242, 242, 242)
+        view.backgroundColor = MKColor.rgb(242, 242, 242)
         rightButton.setImage(moduleIcon(name: "bxs_swf_slotSaveIcon", in: .module), for: .normal)
         
         view.addSubview(tableView)
@@ -116,7 +119,7 @@ class MKSFBXSAccelerationController: MKSwiftBaseViewController {
     }()
     
     private lazy var headerView: MKSFBXSAccelerationHeaderView = {
-        let view = MKSFBXSAccelerationHeaderView.init(frame: CGRect(x: 0, y: 0, width: Screen.width, height: 165.0))
+        let view = MKSFBXSAccelerationHeaderView.init(frame: CGRect(x: 0, y: 0, width: MKScreen.width, height: 165.0))
         view.delegate = self
         return view
     }()

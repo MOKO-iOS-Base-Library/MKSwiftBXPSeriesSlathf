@@ -6,7 +6,9 @@
 //
 
 import UIKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 protocol MKSFBXSAccelerationHeaderViewDelegate: AnyObject {
     func updateThreeAxisNotifyStatus(_ notify: Bool)
@@ -45,7 +47,7 @@ class MKSFBXSAccelerationHeaderView: UIView {
     
     //MARK: - Private methods
     private func setupUI() {
-        backgroundColor = Color.rgb(242, 242, 242)
+        backgroundColor = MKColor.rgb(242, 242, 242)
         
         addSubview(backView)
         backView.addSubview(syncButton)
@@ -83,14 +85,14 @@ class MKSFBXSAccelerationHeaderView: UIView {
             make.left.equalToSuperview().offset(15)
             make.width.equalTo(25)
             make.top.equalTo(syncButton.snp.bottom).offset(2)
-            make.height.equalTo(Font.MKFont(10.0).lineHeight)
+            make.height.equalTo(MKFont.font(10.0).lineHeight)
         }
         
         dataLabel.snp.makeConstraints { make in
             make.left.equalTo(syncButton.snp.right).offset(5)
             make.right.equalToSuperview().offset(-15)
             make.centerY.equalTo(syncButton.snp.centerY).offset(2)
-            make.height.equalTo(Font.MKFont(12.0).lineHeight)
+            make.height.equalTo(MKFont.font(12.0).lineHeight)
         }
         
         bottomView.snp.makeConstraints { make in
@@ -111,14 +113,14 @@ class MKSFBXSAccelerationHeaderView: UIView {
             make.left.equalToSuperview().offset(15)
             make.width.equalTo(150)
             make.centerY.equalToSuperview()
-            make.height.equalTo(Font.MKFont(15.0).lineHeight)
+            make.height.equalTo(MKFont.font(15.0).lineHeight)
         }
         
         mtCountValueLabel.snp.makeConstraints { make in
             make.left.equalTo(mtCountLabel.snp.right).offset(10)
             make.right.equalTo(clearButton.snp.left).offset(-5)
             make.centerY.equalToSuperview()
-            make.height.equalTo(Font.MKFont(12.0).lineHeight)
+            make.height.equalTo(MKFont.font(12.0).lineHeight)
         }
     }
     
@@ -167,18 +169,18 @@ class MKSFBXSAccelerationHeaderView: UIView {
     
     private lazy var syncLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(10.0)
+        label.font = MKFont.font(10.0)
         label.text = "Sync"
         return label
     }()
     
     private lazy var dataLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .left
-        label.font = Font.MKFont(12.0)
+        label.font = MKFont.font(12.0)
         label.text = "X-axis:N/A;Y-axis:N/A;Z-axis:N/A"
         return label
     }()
@@ -197,9 +199,9 @@ class MKSFBXSAccelerationHeaderView: UIView {
     
     private lazy var mtCountValueLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(12.0)
+        label.font = MKFont.font(12.0)
         label.text = "0"
         return label
     }()
@@ -208,7 +210,7 @@ class MKSFBXSAccelerationHeaderView: UIView {
         let button = UIButton()
         button.setTitle("Clear", for: .normal)
         button.setTitleColor(.systemBlue, for: .normal)
-        button.titleLabel?.font = Font.MKFont(15.0)
+        button.titleLabel?.font = MKFont.font(15.0)
         button.addTarget(self, action: #selector(clearButtonPressed), for: .touchUpInside)
         return button
     }()

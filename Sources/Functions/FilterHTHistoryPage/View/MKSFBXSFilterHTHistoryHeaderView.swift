@@ -5,8 +5,11 @@
 //  Created by aa on 2025/7/17.
 //
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 // MARK: - Protocol
 protocol MKSFBXSFilterHTHistoryHeaderViewDelegate: AnyObject {
@@ -45,7 +48,7 @@ class MKSFBXSFilterHTHistoryHeaderView: UIView {
             make.left.equalTo(switchButton.snp.left)
             make.right.equalTo(switchButton.snp.right)
             make.top.equalTo(switchButton.snp.bottom).offset(2)
-            make.height.equalTo(Font.MKFont(10.0).lineHeight)
+            make.height.equalTo(MKFont.font(10.0).lineHeight)
         }
         
         exportButton.snp.makeConstraints { make in
@@ -59,14 +62,14 @@ class MKSFBXSFilterHTHistoryHeaderView: UIView {
             make.left.equalTo(exportButton.snp.left)
             make.right.equalTo(exportButton.snp.right)
             make.top.equalTo(exportButton.snp.bottom).offset(2)
-            make.height.equalTo(Font.MKFont(10.0).lineHeight)
+            make.height.equalTo(MKFont.font(10.0).lineHeight)
         }
         
         sumLabel.snp.makeConstraints { make in
             make.left.equalTo(exportButton.snp.right).offset(30)
             make.right.equalTo(-15)
             make.centerY.equalTo(switchButton.snp.centerY)
-            make.height.equalTo(Font.MKFont(10.0).lineHeight)
+            make.height.equalTo(MKFont.font(10.0).lineHeight)
         }
     }
     
@@ -106,9 +109,9 @@ class MKSFBXSFilterHTHistoryHeaderView: UIView {
     
     private lazy var exportLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(10.0)
+        label.font = MKFont.font(10.0)
         label.text = "Export"
         return label
     }()
@@ -122,18 +125,18 @@ class MKSFBXSFilterHTHistoryHeaderView: UIView {
     
     private lazy var switchLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(10.0)
+        label.font = MKFont.font(10.0)
         label.text = "Display"
         return label
     }()
     
     private lazy var sumLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .left
-        label.font = Font.MKFont(13.0)
+        label.font = MKFont.font(13.0)
         label.text = "Records: N/A"
         return label
     }()

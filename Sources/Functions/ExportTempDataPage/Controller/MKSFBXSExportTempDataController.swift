@@ -8,19 +8,22 @@
 // MKSFBXSExportTempDataController.swift
 import UIKit
 import MessageUI
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 import MKSwiftBleModule
 
 class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
     
     // MARK: - Constants
-    private let textBackViewHeight = Screen.height - Layout.navigationBarHeight - 170.0
+    private let textBackViewHeight = MKScreen.height - MKLayout.navigationBarHeight - 170.0
     private let timeViewWidth: CGFloat = 130.0
     private let tempTextViewWidth: CGFloat = 80.0
     private let tTextViewOffset_Y: CGFloat = 160.0
     private var textViewSpace: CGFloat {
-        return (Screen.width - 30.0 - timeViewWidth - 2 * tempTextViewWidth) / 4
+        return (MKScreen.width - 30.0 - timeViewWidth - 2 * tempTextViewWidth) / 4
     }
     
     // MARK: - Properties
@@ -95,8 +98,8 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
         topView.resetAllStatus()
         
         UIView.animate(withDuration: 0.3) {
-            self.textBackView.frame = CGRect(x: 10.0, y: self.tTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
-            self.curveView.frame = CGRect(x: Screen.width - 10.0, y: self.tTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
+            self.textBackView.frame = CGRect(x: 10.0, y: self.tTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
+            self.curveView.frame = CGRect(x: MKScreen.width - 10.0, y: self.tTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
         }
         
         _ = MKSwiftBXPSCentralManager.shared.notifyRecordTHData(false)
@@ -321,7 +324,7 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
         
         let infoDictionary = Bundle.main.infoDictionary
         let version = infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-        let bodyMsg = "APP Version: \(version) + + OS: \(App.systemVersion)"
+        let bodyMsg = "APP Version: \(version) + + OS: \(MKApp.systemVersion)"
         
         let mailComposer = MFMailComposeViewController()
         mailComposer.mailComposeDelegate = self
@@ -340,7 +343,7 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
     
     private func loadSubViews() {
         defaultTitle = "Export Temperature Data"
-        view.backgroundColor = Color.rgb(242, 242, 242)
+        view.backgroundColor = MKColor.rgb(242, 242, 242)
         
         view.addSubview(backView)
         backView.snp.makeConstraints { make in
@@ -369,7 +372,7 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
         backView.addSubview(textBackView)
         textBackView.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(10)
-            make.width.equalTo(Screen.width - 30)
+            make.width.equalTo(MKScreen.width - 30)
             make.top.equalToSuperview().offset(tTextViewOffset_Y)
             make.height.equalTo(textBackViewHeight)
         }
@@ -378,14 +381,14 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
         textView.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(10)
             make.right.equalToSuperview().offset(-10)
-            make.top.equalToSuperview().offset(3 * 5 + Font.MKFont(13.0).lineHeight)
+            make.top.equalToSuperview().offset(3 * 5 + MKFont.font(13.0).lineHeight)
             make.bottom.equalToSuperview().offset(-40)
         }
         
         backView.addSubview(curveView)
         curveView.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(Screen.width - 10)
-            make.width.equalTo(Screen.width - 30)
+            make.left.equalToSuperview().offset(MKScreen.width - 10)
+            make.width.equalTo(MKScreen.width - 30)
             make.top.equalToSuperview().offset(tTextViewOffset_Y)
             make.height.equalTo(textBackViewHeight)
         }
@@ -415,10 +418,10 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
     private lazy var textView: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = .white
-        textView.font = Font.MKFont(13.0)
+        textView.font = MKFont.font(13.0)
         textView.layoutManager.allowsNonContiguousLayout = false
         textView.isEditable = false
-        textView.textColor = Color.defaultText
+        textView.textColor = MKColor.defaultText
         return textView
     }()
     
@@ -427,7 +430,7 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
         view.layer.masksToBounds = true
         view.layer.borderWidth = 0.5
         view.layer.cornerRadius = 2.0
-        view.layer.borderColor = Color.rgb(227, 227, 227).cgColor
+        view.layer.borderColor = MKColor.rgb(227, 227, 227).cgColor
         
         let timeLabel = loadTextLabel("Time")
         let tempLabel = loadTextLabel("Temperature")
@@ -435,8 +438,8 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
         view.addSubview(timeLabel)
         view.addSubview(tempLabel)
         
-        timeLabel.frame = CGRect(x: textViewSpace, y: 5.0, width: timeViewWidth, height: Font.MKFont(13.0).lineHeight)
-        tempLabel.frame = CGRect(x: 2 * textViewSpace + timeViewWidth, y: 5.0, width: tempTextViewWidth, height: Font.MKFont(13.0).lineHeight)
+        timeLabel.frame = CGRect(x: textViewSpace, y: 5.0, width: timeViewWidth, height: MKFont.font(13.0).lineHeight)
+        tempLabel.frame = CGRect(x: 2 * textViewSpace + timeViewWidth, y: 5.0, width: tempTextViewWidth, height: MKFont.font(13.0).lineHeight)
         
         return view
     }()
@@ -452,8 +455,8 @@ class MKSFBXSExportTempDataController: MKSwiftBaseViewController {
     
     private func loadTextLabel(_ text: String) -> UILabel {
         let label = UILabel()
-        label.textColor = Color.defaultText
-        label.font = Font.MKFont(13.0)
+        label.textColor = MKColor.defaultText
+        label.font = MKFont.font(13.0)
         label.textAlignment = .center
         label.text = text
         return label
@@ -501,8 +504,8 @@ extension MKSFBXSExportTempDataController: @preconcurrency MKSFBXSExportDataHead
     func mk_bxs_swf_switchButtonPressed(_ selected: Bool) {
         if selected {
             UIView.animate(withDuration: 0.3) {
-                self.textBackView.frame = CGRect(x: -(Screen.width - 10.0), y: self.tTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
-                self.curveView.frame = CGRect(x: 10.0, y: self.tTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
+                self.textBackView.frame = CGRect(x: -(MKScreen.width - 10.0), y: self.tTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
+                self.curveView.frame = CGRect(x: 10.0, y: self.tTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
             } completion: { _ in
                 self.drawHTCurveView()
             }
@@ -510,8 +513,8 @@ extension MKSFBXSExportTempDataController: @preconcurrency MKSFBXSExportDataHead
         }
         
         UIView.animate(withDuration: 0.3) {
-            self.textBackView.frame = CGRect(x: 10.0, y: self.tTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
-            self.curveView.frame = CGRect(x: Screen.width - 10.0, y: self.tTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
+            self.textBackView.frame = CGRect(x: 10.0, y: self.tTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
+            self.curveView.frame = CGRect(x: MKScreen.width - 10.0, y: self.tTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
         }
     }
     

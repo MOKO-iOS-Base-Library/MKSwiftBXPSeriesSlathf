@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSSlotBeaconCellModel {
     var major: String = ""
@@ -195,8 +198,8 @@ class MKSFBXSSlotBeaconCell: MKSwiftBaseCell {
     
     private lazy var hexLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
-        label.font = Font.MKFont(12.0)
+        label.textColor = MKColor.defaultText
+        label.font = MKFont.font(12.0)
         label.textAlignment = .right
         label.text = "0x"
         return label

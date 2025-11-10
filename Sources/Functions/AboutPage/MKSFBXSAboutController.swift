@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSAboutController: MKSwiftBaseViewController {
     
@@ -90,27 +93,27 @@ class MKSFBXSAboutController: MKSwiftBaseViewController {
     
     private lazy var appNameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(20.0)
+        label.font = MKFont.font(20.0)
         label.text = "MK Sensor"
         return label
     }()
     
     private lazy var versionLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.rgb(189, 189, 189)
+        label.textColor = MKColor.rgb(189, 189, 189)
         label.textAlignment = .center
-        label.font = Font.MKFont(16.0)
-        label.text = "Version: V\(App.version)"
+        label.font = MKFont.font(16.0)
+        label.text = "Version: V\(MKApp.version)"
         return label
     }()
     
     private lazy var companyNameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(16.0)
+        label.font = MKFont.font(16.0)
         label.text = "MOKO TECHNOLOGY LTD."
         return label
     }()
@@ -118,14 +121,14 @@ class MKSFBXSAboutController: MKSwiftBaseViewController {
     private lazy var companyNetLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.textColor = Color.navBar
-        label.font = Font.MKFont(16.0)
+        label.textColor = MKColor.navBar
+        label.font = MKFont.font(16.0)
         label.text = "www.mokoblue.com"
         label.isUserInteractionEnabled = true
         label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openWebBrowser)))
         
         let lineView = UIView()
-        lineView.backgroundColor = Color.rgb(3, 191, 234)
+        lineView.backgroundColor = MKColor.rgb(3, 191, 234)
         label.addSubview(lineView)
         lineView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()

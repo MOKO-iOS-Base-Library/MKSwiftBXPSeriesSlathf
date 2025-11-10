@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSOptionsCellModel {
     var msg: String = ""
@@ -57,7 +60,7 @@ class MKSFBXSOptionsCell: MKSwiftBaseCell {
             make.left.equalTo(15)
             make.right.equalTo(-15)
             make.top.equalTo(10)
-            make.height.equalTo(Font.MKFont(15.0).lineHeight)
+            make.height.equalTo(MKFont.font(15.0).lineHeight)
         }
         
         icon.snp.remakeConstraints { make in
@@ -95,8 +98,8 @@ class MKSFBXSOptionsCell: MKSwiftBaseCell {
     private lazy var noteLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
-        label.font = Font.MKFont(13.0)
-        label.textColor = Color.rgb(175, 175, 175)
+        label.font = MKFont.font(13.0)
+        label.textColor = MKColor.rgb(175, 175, 175)
         label.numberOfLines = 0
         return label
     }()

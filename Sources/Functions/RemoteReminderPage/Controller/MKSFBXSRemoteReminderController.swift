@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSRemoteReminderController: MKSwiftBaseViewController {
     
@@ -198,7 +201,7 @@ class MKSFBXSRemoteReminderController: MKSwiftBaseViewController {
     // MARK: - UI
     private func loadSubViews() {
         defaultTitle = "Remote reminder"
-        view.backgroundColor = Color.rgb(242, 242, 242)
+        view.backgroundColor = MKColor.rgb(242, 242, 242)
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
@@ -213,7 +216,7 @@ class MKSFBXSRemoteReminderController: MKSwiftBaseViewController {
         let view = MKSwiftBaseTableView(frame: .zero, style: .plain)
         view.delegate = self
         view.dataSource = self
-        view.backgroundColor = Color.rgb(242, 242, 242)
+        view.backgroundColor = MKColor.rgb(242, 242, 242)
         return view
     }()
 }

@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSOptionsController: MKSwiftBaseViewController {
     
@@ -51,7 +54,7 @@ class MKSFBXSOptionsController: MKSwiftBaseViewController {
     
     private func loadSubViews() {
         defaultTitle = "DEVICE TYPE"
-        view.backgroundColor = Color.rgb(242, 242, 242)
+        view.backgroundColor = MKColor.rgb(242, 242, 242)
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in

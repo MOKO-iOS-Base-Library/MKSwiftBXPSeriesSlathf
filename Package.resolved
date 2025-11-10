@@ -1,5 +1,5 @@
 {
-  "originHash" : "6e54b98eebb1ec116963e70ae85d3333b25ff6fd51da7c518539ad18d468fd85",
+  "originHash" : "56b88cc9f668f036eda4e3243c1c1f81c7ab70a8507307e8e635ba22db6b0d7c",
   "pins" : [
     {
       "identity" : "datetimepicker",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/devicekit/DeviceKit.git",
       "state" : {
-        "revision" : "513b9d7e7a1bd46504a1009bbab943b75ce2f195",
-        "version" : "5.6.0"
+        "revision" : "581df61650bc457ec00373a592a84be3e7468eb1",
+        "version" : "5.7.0"
       }
     },
     {
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MOKO-iOS-Base-Library/MKBaseSwiftModule.git",
       "state" : {
-        "revision" : "9cefde7c090e526f92f898a2862f8264b59a9f3d",
-        "version" : "1.0.16"
+        "revision" : "55914eba2655699fe487d6499fdacb7face3034d",
+        "version" : "1.0.22"
       }
     },
     {
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MOKO-iOS-Base-Library/MKSwiftBeaconXCustomUI.git",
       "state" : {
-        "revision" : "b162732c23b6cb701b0c58ff44e9b0c248ccce13",
-        "version" : "1.0.10"
+        "revision" : "6483efa9b7df13bf8f9575c88ca9be7c2e4367dd",
+        "version" : "1.0.12"
       }
     },
     {
@@ -80,6 +80,24 @@
       "state" : {
         "revision" : "bdad0f2e215af623750cbb1a8771dab9b8688911",
         "version" : "1.0.13"
+      }
+    },
+    {
+      "identity" : "mkswiftcustomui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MOKO-iOS-Base-Library/MKSwiftCustomUI.git",
+      "state" : {
+        "revision" : "b720cceebabef3b6f25a439ecaec4920fff76abf",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "mkswiftuilibrary",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MOKO-iOS-Base-Library/MKSwiftUILibrary.git",
+      "state" : {
+        "revision" : "b88d81d17817178799d7a7644bc0d2363027ac8e",
+        "version" : "1.0.6"
       }
     },
     {
@@ -123,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/weichsel/ZIPFoundation.git",
       "state" : {
-        "revision" : "02b6abe5f6eef7e3cbd5f247c5cc24e246efcfe0",
-        "version" : "0.9.19"
+        "revision" : "22787ffb59de99e5dc1fbfe80b19c97a904ad48d",
+        "version" : "0.9.20"
       }
     }
   ],

@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 protocol MKSFBXSSlotFrameTypePickViewDelegate: AnyObject {
     func bxs_swf_slotFrameTypeChanged(frameType: MKSFBXSSlotType)
@@ -101,7 +104,7 @@ class MKSFBXSSlotFrameTypePickView: UIView {
         picker.dataSource = self
         picker.delegate = self
         picker.layer.masksToBounds = true
-        picker.layer.borderColor = Color.navBar.cgColor
+        picker.layer.borderColor = MKColor.navBar.cgColor
         picker.layer.borderWidth = 0.5
         picker.layer.cornerRadius = 4
         return picker
@@ -127,10 +130,10 @@ extension MKSFBXSSlotFrameTypePickView: UIPickerViewDataSource, UIPickerViewDele
             titleLabel = label
         } else {
             titleLabel = UILabel()
-            titleLabel.textColor = Color.defaultText
+            titleLabel.textColor = MKColor.defaultText
             titleLabel.adjustsFontSizeToFitWidth = true
             titleLabel.textAlignment = .center
-            titleLabel.font = Font.MKFont(12.0)
+            titleLabel.font = MKFont.font(12.0)
         }
         
         if row == frameType.rawValue {
@@ -157,6 +160,6 @@ extension MKSFBXSSlotFrameTypePickView: UIPickerViewDataSource, UIPickerViewDele
     }
     
     private func attributedTitle(forRow row: Int, component: Int) -> NSAttributedString {
-        return MKSwiftUIAdaptor.createAttributedString(strings: [dataList[row]], fonts: [Font.MKFont(13.0)], colors: [Color.navBar])
+        return MKSwiftUIAdaptor.createAttributedString(strings: [dataList[row]], fonts: [MKFont.font(13.0)], colors: [MKColor.navBar])
     }
 }

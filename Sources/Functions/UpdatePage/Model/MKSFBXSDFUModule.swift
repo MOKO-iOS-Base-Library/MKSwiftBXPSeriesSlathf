@@ -6,6 +6,7 @@
 //
 
 @preconcurrency import CoreBluetooth
+
 import MKBaseSwiftModule
 
 /*
@@ -123,17 +124,17 @@ class MKSFBXSDFUModule {
             do {
                 if characteristic.isEqual(MKSwiftBXPSCentralManager.shared.otaContralCharacteristic()) {
                     if self.otaProcess == .reconnect {
-                        if MKSwiftBXPSCentralManager.shared.otaDataCharacteristic() != nil {
-                            //当前设备不需要重连
-                            NotificationCenter.default.addObserver(
-                                self,
-                                selector: #selector(self.deviceConnectTypeChanged),
-                                name: .mk_bxs_swf_peripheralConnectStateChanged,
-                                object: nil
-                            )
-                            self.writeFileData(toCharacteristic: characteristic)
-                            return
-                        }
+//                        if MKSwiftBXPSCentralManager.shared.otaDataCharacteristic() != nil {
+//                            //当前设备不需要重连
+//                            NotificationCenter.default.addObserver(
+//                                self,
+//                                selector: #selector(self.deviceConnectTypeChanged),
+//                                name: .mk_bxs_swf_peripheralConnectStateChanged,
+//                                object: nil
+//                            )
+//                            self.writeFileData(toCharacteristic: characteristic)
+//                            return
+//                        }
                         try await self.reconnectDevice()
                         return
                     }

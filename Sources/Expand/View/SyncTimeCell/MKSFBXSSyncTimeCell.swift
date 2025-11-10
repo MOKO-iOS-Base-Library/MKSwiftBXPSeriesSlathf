@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSSyncTimeCellModel {
     var date: String = ""
@@ -102,6 +105,6 @@ class MKSFBXSSyncTimeCell: MKSwiftBaseCell {
     }()
     
     private lazy var dateLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(14.0))
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(14.0))
     }()
 }

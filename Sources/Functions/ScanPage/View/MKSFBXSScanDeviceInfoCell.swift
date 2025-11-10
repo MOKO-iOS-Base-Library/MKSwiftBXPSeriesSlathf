@@ -7,8 +7,11 @@
 
 import UIKit
 import CoreBluetooth
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 protocol MKSFBXSScanDeviceInfoCellDelegate: AnyObject {
     func mk_bxs_swf_connectPeripheral(_ dataModel: MKSFBXSScanInfoCellModel)
@@ -170,7 +173,7 @@ class MKSFBXSScanDeviceInfoCell: MKSwiftBaseCell {
     
     private func createLabel(font: UIFont) -> UILabel {
         let label = UILabel()
-        label.textColor = Color.rgb(184, 184, 184)
+        label.textColor = MKColor.rgb(184, 184, 184)
         label.textAlignment = .left
         label.font = font
         return label
@@ -240,7 +243,7 @@ class MKSFBXSScanDeviceInfoCell: MKSwiftBaseCell {
     }()
     
     private lazy var rssiLabel: UILabel = {
-        let label = createLabel(font: Font.MKFont(10.0))
+        let label = createLabel(font: MKFont.font(10.0))
         label.textAlignment = .center
         return label
     }()
@@ -262,21 +265,21 @@ class MKSFBXSScanDeviceInfoCell: MKSwiftBaseCell {
     }()
     
     private lazy var batteryLabel: UILabel = {
-        let label = createLabel(font: Font.MKFont(10.0))
+        let label = createLabel(font: MKFont.font(10.0))
         label.textAlignment = .center
         return label
     }()
     
     private lazy var macLabel: UILabel = {
-        return createLabel(font: Font.MKFont(12.0))
+        return createLabel(font: MKFont.font(12.0))
     }()
     
     private lazy var devieIDLabel: UILabel = {
-        return createLabel(font: Font.MKFont(12.0))
+        return createLabel(font: MKFont.font(12.0))
     }()
     
     private lazy var timeLabel: UILabel = {
-        let label = createLabel(font: Font.MKFont(10.0))
+        let label = createLabel(font: MKFont.font(10.0))
         label.textAlignment = .center
         return label
     }()

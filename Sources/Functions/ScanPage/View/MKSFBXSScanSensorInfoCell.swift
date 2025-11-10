@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 import MKSwiftBeaconXCustomUI
 
 class MKSFBXSScanSensorInfoCellModel: MKSwiftBXScanBaseModel {
@@ -144,9 +147,9 @@ class MKSFBXSScanSensorInfoCell: MKSwiftBaseCell {
     
     private func createLabel(text: String = "") -> UILabel {
         let label = UILabel()
-        label.textColor = Color.rgb(184, 184, 184)
+        label.textColor = MKColor.rgb(184, 184, 184)
         label.textAlignment = .left
-        label.font = Font.MKFont(12.0)
+        label.font = MKFont.font(12.0)
         label.text = text
         return label
     }

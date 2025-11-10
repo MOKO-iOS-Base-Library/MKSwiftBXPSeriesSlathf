@@ -7,7 +7,9 @@
 
 @preconcurrency import UIKit
 import CoreBluetooth
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSUpdateController: MKSwiftBaseViewController {
     
@@ -47,6 +49,7 @@ class MKSFBXSUpdateController: MKSwiftBaseViewController {
     private func updateComplete() {
         leftButton.isEnabled = true
         MKSwiftHudManager.shared.hide()
+        MKSwiftBXPSCentralManager.shared.disconnect()
         MKSwiftBXPSCentralManager.sharedDealloc()
         NotificationCenter.default.post(name: Notification.Name("mk_bxs_swf_centralDeallocNotification"), object: nil)
         popToViewController(withClassName: "MKSFBXSScanController")
@@ -139,7 +142,7 @@ class MKSFBXSUpdateController: MKSwiftBaseViewController {
 extension MKSFBXSUpdateController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let cellModel = dataList[indexPath.row]
-        return cellModel.cellHeightWithContentWidth(Screen.width)
+        return cellModel.cellHeightWithContentWidth(MKScreen.width)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -181,9 +184,10 @@ extension MKSFBXSUpdateController: UITableViewDelegate, UITableViewDataSource {
                     self?.updateComplete()
                 }
             } catch {
-                MKSwiftHudManager.shared.hide()
-                let errorMessage = error.localizedDescription
-                self.view.showCentralToast(errorMessage)
+                MKSwiftHudManager.shared.showHUD(with: "Opps!DFU Failed. Please try again!", in: self.view, isPenetration: false)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+                    self?.updateComplete()
+                }
             }
         }
     }

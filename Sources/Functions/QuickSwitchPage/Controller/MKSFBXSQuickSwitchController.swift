@@ -5,8 +5,11 @@
 //  Created by aa on 2025/7/19.
 //
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 import MKSwiftBeaconXCustomUI
 
 class MKSFBXSQuickSwitchController: MKSwiftBaseViewController {
@@ -310,7 +313,7 @@ class MKSFBXSQuickSwitchController: MKSwiftBaseViewController {
     
     private func setupUI() {
         defaultTitle = "Quick switch"
-        view.backgroundColor = Color.rgb(242, 242, 242)
+        view.backgroundColor = MKColor.rgb(242, 242, 242)
         
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints { make in
@@ -327,7 +330,7 @@ class MKSFBXSQuickSwitchController: MKSwiftBaseViewController {
         layout.scrollDirection = .vertical
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = Color.rgb(246, 247, 251)
+        collectionView.backgroundColor = MKColor.rgb(246, 247, 251)
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.alwaysBounceVertical = true

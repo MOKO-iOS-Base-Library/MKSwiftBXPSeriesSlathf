@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 // MARK: - Models and Protocols
 
@@ -149,7 +152,7 @@ class MKSFBXSTriggerSlotParamCell: MKSwiftBaseCell {
     }
     
     private func setupTxPowerParams() {
-        txPowerLabel.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["Tx power", "   (-20,-16,-12,-8,-4,0,+3,+4,+6)"], fonts: [Font.MKFont(13.0),Font.MKFont(12.0)], colors: [Color.defaultText,Color.rgb(223, 223, 223)])
+        txPowerLabel.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["Tx power", "   (-20,-16,-12,-8,-4,0,+3,+4,+6)"], fonts: [MKFont.font(13.0),MKFont.font(12.0)], colors: [MKColor.defaultText,MKColor.rgb(223, 223, 223)])
         txPowerSlider.maximumValue = 8
         txPowerSlider.minimumValue = 0
     }
@@ -186,7 +189,7 @@ class MKSFBXSTriggerSlotParamCell: MKSwiftBaseCell {
             return
         }
         
-        rssiLabel.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: [text, "   (-100dBm ~ 0dBm)"], fonts: [Font.MKFont(13.0),Font.MKFont(12.0)], colors: [Color.defaultText,Color.rgb(223, 223, 223)])
+        rssiLabel.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: [text, "   (-100dBm ~ 0dBm)"], fonts: [MKFont.font(13.0),MKFont.font(12.0)], colors: [MKColor.defaultText,MKColor.rgb(223, 223, 223)])
     }
     
     private func addNormalSubViews() {
@@ -367,12 +370,12 @@ class MKSFBXSTriggerSlotParamCell: MKSwiftBaseCell {
     }()
     
     private lazy var intervalLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(12.0) ,text: "Adv interval")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(12.0) ,text: "Adv interval")
     }()
     
     private lazy var intervalField: MKSwiftTextField = {
         let field = MKSwiftUIAdaptor.createTextField(placeholder: "1~100",textType: .realNumberOnly)
-        field.font = Font.MKFont(12.0)
+        field.font = MKFont.font(12.0)
         field.maxLength = 3
         field.textChangedBlock = { [weak self] text in
             self?.delegate?.bxs_swf_triggerSlotParam_advIntervalChanged(text)
@@ -381,16 +384,16 @@ class MKSFBXSTriggerSlotParamCell: MKSwiftBaseCell {
     }()
     
     private lazy var intervalUnitLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(12.0) ,text: "x100ms")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(12.0) ,text: "x100ms")
     }()
     
     private lazy var advDurationLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(12.0) ,text: "Total adv duration")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(12.0) ,text: "Total adv duration")
     }()
     
     private lazy var advDurationField: MKSwiftTextField = {
         let field = MKSwiftUIAdaptor.createTextField(placeholder: "0~65535",textType: .realNumberOnly)
-        field.font = Font.MKFont(12.0)
+        field.font = MKFont.font(12.0)
         field.maxLength = 5
         field.textChangedBlock = { [weak self] text in
             self?.delegate?.bxs_swf_triggerSlotParam_advDurationChanged(text)
@@ -399,7 +402,7 @@ class MKSFBXSTriggerSlotParamCell: MKSwiftBaseCell {
     }()
     
     private lazy var advDurationUnitLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(12.0) ,text: "s")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(12.0) ,text: "s")
     }()
     
     private lazy var rssiLabel: UILabel = {
@@ -417,13 +420,13 @@ class MKSFBXSTriggerSlotParamCell: MKSwiftBaseCell {
     }()
     
     private lazy var rssiValueLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(11.0))
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(11.0))
     }()
     
     private lazy var txPowerLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
-        label.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["Tx power", "   (-20,-16,-12,-8,-4,0,+3,+4,+6)"], fonts: [Font.MKFont(13.0),Font.MKFont(12.0)], colors: [Color.defaultText,Color.rgb(223, 223, 223)])
+        label.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["Tx power", "   (-20,-16,-12,-8,-4,0,+3,+4,+6)"], fonts: [MKFont.font(13.0),MKFont.font(12.0)], colors: [MKColor.defaultText,MKColor.rgb(223, 223, 223)])
         return label
     }()
     
@@ -437,6 +440,6 @@ class MKSFBXSTriggerSlotParamCell: MKSwiftBaseCell {
     }()
     
     private lazy var txPowerValueLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(11.0))
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(11.0))
     }()
 }

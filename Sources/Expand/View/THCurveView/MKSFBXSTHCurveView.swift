@@ -1,18 +1,21 @@
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 @MainActor class MKSFBXSTHCurveViewModel {
     var lineColor: UIColor = .blue
     var lineWidth: CGFloat = 1.0
-    var curveViewBackgroundColor: UIColor = Color.rgb(224, 245, 254)
+    var curveViewBackgroundColor: UIColor = MKColor.rgb(224, 245, 254)
     var curveTitle: String = ""
-    var titleColor: UIColor = Color.defaultText
-    var titleFont: UIFont = Font.MKFont(12.0)
-    var yPostionColor: UIColor = Color.defaultText
-    var yPostionWidth: CGFloat = Line.height
-    var labelColor: UIColor = Color.defaultText
-    var labelFont: UIFont = Font.MKFont(10.0)
+    var titleColor: UIColor = MKColor.defaultText
+    var titleFont: UIFont = MKFont.font(12.0)
+    var yPostionColor: UIColor = MKColor.defaultText
+    var yPostionWidth: CGFloat = MKLine.height
+    var labelColor: UIColor = MKColor.defaultText
+    var labelFont: UIFont = MKFont.font(10.0)
 }
 
 // MARK: - MKSFBXSCurveView
@@ -119,7 +122,7 @@ class MKSFBXSTHCurveView: UIView {
             make.height.equalTo(20)
         }
         
-        let labelHeight = Font.MKFont(10.0).lineHeight
+        let labelHeight = MKFont.font(10.0).lineHeight
         let availableHeight = bounds.height - 10 - 5 * labelHeight
         let dynamicLabelSpace = max(availableHeight / 4, 2) // 确保最小间距为2
         
@@ -214,7 +217,7 @@ class MKSFBXSTHCurveView: UIView {
     }
     
     private var curveViewHeight: CGFloat {
-        return bounds.height - 10 - 2 * Font.MKFont(10.0).lineHeight - 2 * ((bounds.height - 10 - 5 * Font.MKFont(10.0).lineHeight) / 4)
+        return bounds.height - 10 - 2 * MKFont.font(10.0).lineHeight - 2 * ((bounds.height - 10 - 5 * MKFont.font(10.0).lineHeight) / 4)
     }
     
     // MARK: - Public Methods
@@ -280,8 +283,8 @@ class MKSFBXSTHCurveView: UIView {
     private func debugConstraints() {
         #if DEBUG
         print("当前视图大小: \(bounds)")
-        print("标签高度: \(Font.MKFont(10.0).lineHeight)")
-        let availableHeight = bounds.height - 10 - 5 * Font.MKFont(10.0).lineHeight
+        print("标签高度: \(MKFont.font(10.0).lineHeight)")
+        let availableHeight = bounds.height - 10 - 5 * MKFont.font(10.0).lineHeight
         print("可用高度: \(availableHeight)")
         print("计算间距: \(availableHeight / 4)")
         #endif
@@ -290,8 +293,8 @@ class MKSFBXSTHCurveView: UIView {
     // MARK: - UI Components (Lazy loading)
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
-        label.font = Font.MKFont(12.0)
+        label.textColor = MKColor.defaultText
+        label.font = MKFont.font(12.0)
         label.textAlignment = .center
         label.transform = CGAffineTransform(rotationAngle: -CGFloat.pi / 2)
         return label
@@ -299,13 +302,13 @@ class MKSFBXSTHCurveView: UIView {
     
     private lazy var horizontalLine: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.defaultText
+        view.backgroundColor = MKColor.defaultText
         return view
     }()
     
     private lazy var maxLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .right
         label.font = UIFont.systemFont(ofSize: 10)
         return label
@@ -313,7 +316,7 @@ class MKSFBXSTHCurveView: UIView {
     
     private lazy var valueMaxLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .right
         label.font = UIFont.systemFont(ofSize: 10)
         return label
@@ -321,7 +324,7 @@ class MKSFBXSTHCurveView: UIView {
     
     private lazy var aveLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .right
         label.font = UIFont.systemFont(ofSize: 10)
         return label
@@ -329,7 +332,7 @@ class MKSFBXSTHCurveView: UIView {
     
     private lazy var valueMinLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .right
         label.font = UIFont.systemFont(ofSize: 10)
         return label
@@ -337,7 +340,7 @@ class MKSFBXSTHCurveView: UIView {
     
     private lazy var minLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .right
         label.font = UIFont.systemFont(ofSize: 10)
         return label
@@ -345,31 +348,31 @@ class MKSFBXSTHCurveView: UIView {
     
     private lazy var maxLine: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.rgb(136, 136, 136)
+        view.backgroundColor = MKColor.rgb(136, 136, 136)
         return view
     }()
     
     private lazy var valueMaxLine: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.rgb(136, 136, 136)
+        view.backgroundColor = MKColor.rgb(136, 136, 136)
         return view
     }()
     
     private lazy var aveLine: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.rgb(136, 136, 136)
+        view.backgroundColor = MKColor.rgb(136, 136, 136)
         return view
     }()
     
     private lazy var valueMinLine: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.rgb(136, 136, 136)
+        view.backgroundColor = MKColor.rgb(136, 136, 136)
         return view
     }()
     
     private lazy var minLine: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.rgb(136, 136, 136)
+        view.backgroundColor = MKColor.rgb(136, 136, 136)
         return view
     }()
     

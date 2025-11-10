@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKBXPSDeviceTypeCellModel {
     var msg: String = ""
@@ -46,7 +49,7 @@ class MKBXPSDeviceTypeCell: MKSwiftBaseCell {
             make.left.equalTo(15)
             make.right.equalTo(-15)
             make.top.equalTo(10)
-            make.height.equalTo(Font.MKFont(15).lineHeight)
+            make.height.equalTo(MKFont.font(15).lineHeight)
         }
         icon.snp.makeConstraints { make in
             make.left.equalTo(15)
@@ -54,7 +57,7 @@ class MKBXPSDeviceTypeCell: MKSwiftBaseCell {
             make.top.equalTo(msgLabel.snp.bottom).offset(5)
             make.height.equalTo(40)
         }
-        let noteSize = contentLabel.text!.size(withFont: Font.MKFont(13), maxSize: CGSize(width: (contentView.frame.size.width - 2 * 15 - 40 - 5), height: .greatestFiniteMagnitude))
+        let noteSize = contentLabel.text!.size(withFont: MKFont.font(13), maxSize: CGSize(width: (contentView.frame.size.width - 2 * 15 - 40 - 5), height: .greatestFiniteMagnitude))
         contentLabel.snp.remakeConstraints { make in
             make.left.equalTo(icon.snp.right).offset(5)
             make.right.equalTo(-15)
@@ -91,8 +94,8 @@ class MKBXPSDeviceTypeCell: MKSwiftBaseCell {
     private lazy var contentLabel: UILabel = {
         let contentLabel = UILabel()
         contentLabel.textAlignment = .left
-        contentLabel.textColor = Color.rgb(175, 175, 175)
-        contentLabel.font = Font.MKFont(13)
+        contentLabel.textColor = MKColor.rgb(175, 175, 175)
+        contentLabel.font = MKFont.font(13)
         contentLabel.numberOfLines = 0
         return contentLabel
     }()

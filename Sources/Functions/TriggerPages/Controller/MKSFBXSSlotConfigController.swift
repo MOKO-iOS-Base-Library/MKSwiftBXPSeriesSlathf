@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSSlotConfigController: MKSwiftBaseViewController {
     
@@ -231,7 +234,7 @@ class MKSFBXSSlotConfigController: MKSwiftBaseViewController {
     
     private lazy var tableView: MKSwiftBaseTableView = {
         let tableView = MKSwiftBaseTableView(frame: .zero, style: .plain)
-        tableView.backgroundColor = Color.rgb(242, 242, 242)
+        tableView.backgroundColor = MKColor.rgb(242, 242, 242)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableHeaderView = headerView
@@ -239,7 +242,7 @@ class MKSFBXSSlotConfigController: MKSwiftBaseViewController {
     }()
     
     private lazy var headerView: MKSFBXSSlotFrameTypePickView = {
-        let view = MKSFBXSSlotFrameTypePickView(frame: CGRect(x: 0, y: 20, width: Screen.width, height: 130))
+        let view = MKSFBXSSlotFrameTypePickView(frame: CGRect(x: 0, y: 20, width: MKScreen.width, height: 130))
         view.delegate = self
         return view
     }()

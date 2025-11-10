@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSTempSensorHeaderViewModel {
     var temperature: String = ""
@@ -34,7 +37,7 @@ class MKSFBXSTempSensorHeaderView: UIView {
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = Color.rgb(242, 242, 242)
+        backgroundColor = MKColor.rgb(242, 242, 242)
         setupUI()
     }
     
@@ -124,21 +127,21 @@ class MKSFBXSTempSensorHeaderView: UIView {
     }()
     
     private lazy var samplingLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(13.0), text: "Sampling interval")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(13.0), text: "Sampling interval")
     }()
     
     private lazy var textField: MKSwiftTextField = {
         let field = MKSwiftTextField(textFieldType: .realNumberOnly)
-        field.textColor = Color.defaultText
+        field.textColor = MKColor.defaultText
         field.textAlignment = .center
-        field.font = Font.MKFont(12.0)
+        field.font = MKFont.font(12.0)
         field.borderStyle = .none
         field.text = "1"
         field.maxLength = 5
         field.placeholder = "1~65535"
         
         let lineView = UIView()
-        lineView.backgroundColor = Color.defaultText
+        lineView.backgroundColor = MKColor.defaultText
         field.addSubview(lineView)
         lineView.snp.makeConstraints { make in
             make.left.right.bottom.equalToSuperview()
@@ -156,7 +159,7 @@ class MKSFBXSTempSensorHeaderView: UIView {
     private lazy var unitLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
-        label.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["sec", "   (1 ~ 65535)"], fonts: [Font.MKFont(13.0),Font.MKFont(12.0)], colors: [Color.defaultText,Color.rgb(223, 223, 223)])
+        label.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["sec", "   (1 ~ 65535)"], fonts: [MKFont.font(13.0),MKFont.font(12.0)], colors: [MKColor.defaultText,MKColor.rgb(223, 223, 223)])
         
         return label
     }()
@@ -222,9 +225,9 @@ private class MKSFBXSTempConfigValueView: UIView {
         return MKSwiftUIAdaptor.createNormalLabel()
     }()
     lazy var valueLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(28.0))
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(28.0))
     }()
     lazy var unitLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(12.0))
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(12.0))
     }()
 }

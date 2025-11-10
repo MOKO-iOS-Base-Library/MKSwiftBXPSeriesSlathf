@@ -6,8 +6,12 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
+import MKSwiftUILibrary
 
 protocol MKSFBXSTabBarControllerDelegate: AnyObject {
     /// Return to scan page, definitely need to start scanning
@@ -169,14 +173,14 @@ class MKSFBXSTabBarController: UITabBarController {
         let settingNav = MKSwiftBaseNavigationController(rootViewController: settingPage)
         
         // Device Page
-        let devicePage = MKSFBXSDeviceInfoController()
+        let devicePage = MKSFUAdapter.toNavigationController(MKSFUBXSDeviceInfoView())
         devicePage.tabBarItem = UITabBarItem(
             title: "DEVICE",
             image: moduleIcon(name: "bxs_swf_deviceTabBarItemUnselected", in: .module),
             selectedImage: moduleIcon(name: "bxs_swf_deviceTabBarItemSelected", in: .module)
         )
-        let deviceNav = MKSwiftBaseNavigationController(rootViewController: devicePage)
+//        let deviceNav = MKSwiftBaseNavigationController(rootViewController: devicePage)
         
-        viewControllers = [slotNav, settingNav, deviceNav]
+        viewControllers = [slotNav, settingNav, devicePage]
     }
 }

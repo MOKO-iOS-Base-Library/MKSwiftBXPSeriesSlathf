@@ -6,10 +6,12 @@
 //
 
 import Foundation
-import CoreBluetooth
-import MKSwiftBeaconXCustomUI
-import MKBaseSwiftModule
 import UIKit
+import CoreBluetooth
+
+import MKBaseSwiftModule
+import MKSwiftCustomUI
+import MKSwiftBeaconXCustomUI
 
 class MKSFBXSScanPageAdopter {
     

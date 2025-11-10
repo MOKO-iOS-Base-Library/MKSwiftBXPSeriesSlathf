@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSHallSensorHeaderViewModel {
     var count: String = ""
@@ -29,7 +32,7 @@ class MKSFBXSHallSensorHeaderView: UIView {
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = Color.rgb(242, 242, 242)
+        backgroundColor = MKColor.rgb(242, 242, 242)
         setupUI()
     }
     
@@ -100,9 +103,9 @@ class MKSFBXSHallSensorHeaderView: UIView {
     
     private lazy var mtCountValueLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(12.0)
+        label.font = MKFont.font(12.0)
         label.text = "0"
         return label
     }()

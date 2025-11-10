@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSScanFilterView: UIView {
     
@@ -60,7 +63,7 @@ class MKSFBXSScanFilterView: UIView {
         backView.addSubview(noteLabel1)
         backView.addSubview(doneButton)
         
-        let backViewWidth = Screen.width - 2 * offsetX
+        let backViewWidth = MKScreen.width - 2 * offsetX
         let textFieldPositionX = offsetX + 100 + 5
         let textFieldWidth = backViewWidth - textFieldPositionX - offsetX
         let nameLabelPositionY: CGFloat = 10
@@ -205,7 +208,7 @@ class MKSFBXSScanFilterView: UIView {
     }
     
     private func showSearchName(_ name: String, tagID: String, rssi: Int, searchBlock: @escaping (String, String, Int) -> Void) {
-        App.window!.addSubview(self)
+        MKApp.window!.addSubview(self)
         
         self.searchBlock = searchBlock
         nameTextField.text = name
@@ -228,52 +231,52 @@ class MKSFBXSScanFilterView: UIView {
     }()
     
     private lazy var nameLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(14.0),text: "BLE Name")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(14.0),text: "BLE Name")
     }()
     
     private lazy var nameTextField: MKSwiftTextField = {
         let textField = MKSwiftTextField.init(textFieldType: .normal)
         textField.maxLength = 20
-        textField.textColor = Color.defaultText
+        textField.textColor = MKColor.defaultText
         textField.borderStyle = .none
-        textField.font = Font.MKFont(13.0)
+        textField.font = MKFont.font(13.0)
         textField.placeholder = "1-20 characters"
         textField.clearButtonMode = .whileEditing
         textField.layer.masksToBounds = true
-        textField.layer.borderColor = Color.navBar.cgColor
+        textField.layer.borderColor = MKColor.navBar.cgColor
         textField.layer.borderWidth = 0.5
         textField.layer.cornerRadius = 4
         return textField
     }()
     
     private lazy var tagLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(14.0),text: "Tag ID")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(14.0),text: "Tag ID")
     }()
     
     private lazy var tagTextField: MKSwiftTextField = {
         let textField = MKSwiftTextField.init(textFieldType: .hexCharOnly)
         textField.maxLength = 12
-        textField.textColor = Color.defaultText
+        textField.textColor = MKColor.defaultText
         textField.borderStyle = .none
-        textField.font = Font.MKFont(13.0)
+        textField.font = MKFont.font(13.0)
         textField.placeholder = "1-6 Bytes"
         textField.clearButtonMode = .whileEditing
         textField.layer.masksToBounds = true
-        textField.layer.borderColor = Color.navBar.cgColor
+        textField.layer.borderColor = MKColor.navBar.cgColor
         textField.layer.borderWidth = 0.5
         textField.layer.cornerRadius = 4
         return textField
     }()
     
     private lazy var minRssiLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(14.0),text: "Min. RSSI")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(14.0),text: "Min. RSSI")
     }()
     
     private lazy var rssiValueLabel: UILabel = {
-        let label = MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(14.0),text: "-100dBm")
+        let label = MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(14.0),text: "-100dBm")
         
         let lineView = UIView()
-        lineView.backgroundColor = Color.defaultText
+        lineView.backgroundColor = MKColor.defaultText
         label.addSubview(lineView)
         lineView.snp.makeConstraints { make in
             make.leading.trailing.bottom.equalToSuperview()
@@ -308,16 +311,16 @@ class MKSFBXSScanFilterView: UIView {
         let label = UILabel()
         label.textColor = .gray
         label.textAlignment = .left
-        label.font = Font.MKFont(11.0)
+        label.font = MKFont.font(11.0)
         label.text = "-100dBm"
         return label
     }()
     
     private lazy var maxLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.rgb(15, 131, 255)
+        label.textColor = MKColor.rgb(15, 131, 255)
         label.textAlignment = .left
-        label.font = Font.MKFont(11.0)
+        label.font = MKFont.font(11.0)
         label.text = "0dBm"
         return label
     }()
@@ -325,7 +328,7 @@ class MKSFBXSScanFilterView: UIView {
     private lazy var noteLabel1: UILabel = {
         let label = UILabel()
         label.textColor = .orange
-        label.font = Font.MKFont(11.0)
+        label.font = MKFont.font(11.0)
         label.numberOfLines = 0
         label.textAlignment = .left
         label.text = noteMsg1

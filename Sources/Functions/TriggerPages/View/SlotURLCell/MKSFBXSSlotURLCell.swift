@@ -7,8 +7,11 @@
 
 // MKSFBXSSlotURLCell.swift
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 // MARK: - Models and Protocols
 
@@ -157,14 +160,14 @@ class MKSFBXSSlotURLCell: MKSwiftBaseCell {
     }()
     
     private lazy var msgLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(14.0) ,text: "URL")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(14.0) ,text: "URL")
     }()
     
     private lazy var urlTypeLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
-        label.textColor = Color.rgb(111, 111, 111)
-        label.font = Font.MKFont(12.0)
+        label.textColor = MKColor.rgb(111, 111, 111)
+        label.font = MKFont.font(12.0)
         label.text = "http://www."
         
         label.layer.masksToBounds = true

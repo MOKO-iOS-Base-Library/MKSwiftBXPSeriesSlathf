@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 import MKBaseSwiftModule
 
 enum DeviceInfoModelError: LocalizedError {
@@ -54,6 +55,7 @@ class MKSFBXSDeviceInfoModel {
     var manu: String = ""
     var manuDate: String = ""
     
+    @MainActor
     func read() async throws {
         do {
             macAddress = try await MKSFBXSInterface.readMacAddress()

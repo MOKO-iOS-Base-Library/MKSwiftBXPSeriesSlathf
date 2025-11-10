@@ -6,7 +6,9 @@
 //
 
 import UIKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSAccelerationParamsCellModel {
     /// 0:1hz,1:10hz,2:25hz,3:50hz,4:100hz
@@ -200,37 +202,37 @@ class MKSFBXSAccelerationParamsCell: MKSwiftBaseCell {
     }()
     
     private lazy var scaleLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(13.0),text: "Full-scale")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(13.0),text: "Full-scale")
     }()
     
     private lazy var scaleButton: UIButton = {
         let button = UIButton()
-        button.titleLabel?.font = Font.MKFont(12.0)
+        button.titleLabel?.font = MKFont.font(12.0)
         button.setTitleColor(.darkText, for: .normal)
         button.addTarget(self, action: #selector(scaleButtonPressed), for: .touchUpInside)
-        button.layer.borderColor = Color.navBar.cgColor
+        button.layer.borderColor = MKColor.navBar.cgColor
         button.layer.borderWidth = 0.5
         button.layer.cornerRadius = 6
         return button
     }()
     
     private lazy var sampleRateLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(13.0),text: "Sampling rate")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(13.0),text: "Sampling rate")
     }()
     
     private lazy var sampleRateButton: UIButton = {
         let button = UIButton()
-        button.titleLabel?.font = Font.MKFont(12.0)
+        button.titleLabel?.font = MKFont.font(12.0)
         button.setTitleColor(.darkText, for: .normal)
         button.addTarget(self, action: #selector(sampleRateButtonPressed), for: .touchUpInside)
-        button.layer.borderColor = Color.navBar.cgColor
+        button.layer.borderColor = MKColor.navBar.cgColor
         button.layer.borderWidth = 0.5
         button.layer.cornerRadius = 6
         return button
     }()
     
     private lazy var thresholdLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(13.0),text: "Motion threshold")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(13.0),text: "Motion threshold")
     }()
     
     private lazy var textField: MKSwiftTextField = {
@@ -244,6 +246,6 @@ class MKSFBXSAccelerationParamsCell: MKSwiftBaseCell {
     }()
     
     private lazy var thresholdUnitLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(12.0),text: "x3.91mg")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(12.0),text: "x3.91mg")
     }()
 }

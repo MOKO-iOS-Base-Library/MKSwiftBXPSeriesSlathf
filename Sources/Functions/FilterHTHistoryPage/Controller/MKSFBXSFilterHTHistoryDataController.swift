@@ -7,18 +7,21 @@
 
 import UIKit
 import MessageUI
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSFilterHTHistoryDataController: MKSwiftBaseViewController {
     
     // MARK: - Constants
-    private let textBackViewHeight = Screen.height - Layout.topBarHeight - 70.0
+    private let textBackViewHeight = MKScreen.height - MKLayout.topBarHeight - 70.0
     private let timeTextViewWidth: CGFloat = 130.0
     private let htTextViewWidth: CGFloat = 80.0
     private let htTextViewOffset_Y: CGFloat = 60.0
     private var textViewSpace: CGFloat {
-        return (Screen.width - 30.0 - timeTextViewWidth - 2 * htTextViewWidth) / 4
+        return (MKScreen.width - 30.0 - timeTextViewWidth - 2 * htTextViewWidth) / 4
     }
     
     // MARK: - Properties
@@ -97,7 +100,7 @@ class MKSFBXSFilterHTHistoryDataController: MKSwiftBaseViewController {
         
         let infoDictionary = Bundle.main.infoDictionary
         let version = infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-        let bodyMsg = "APP Version: \(version) + + OS: \(App.systemVersion)"
+        let bodyMsg = "APP Version: \(version) + + OS: \(MKApp.systemVersion)"
         
         let mailComposer = MFMailComposeViewController()
         mailComposer.mailComposeDelegate = self
@@ -111,7 +114,7 @@ class MKSFBXSFilterHTHistoryDataController: MKSwiftBaseViewController {
     
     private func loadSubViews() {
         defaultTitle = "Export T&H Data"
-        view.backgroundColor = Color.rgb(242, 242, 242)
+        view.backgroundColor = MKColor.rgb(242, 242, 242)
         
         view.addSubview(backView)
         backView.snp.remakeConstraints { make in
@@ -150,25 +153,25 @@ class MKSFBXSFilterHTHistoryDataController: MKSwiftBaseViewController {
     }()
     
     private lazy var textView: UITextView = {
-        let textView = UITextView(frame: CGRect(x: 10.0, y: 3 * 5.0 + Font.MKFont(13.0).lineHeight, width: Screen.width - 30.0 - 2 * 10.0 , height: textBackViewHeight - 55.0 - Font.MKFont(13.0).lineHeight))
-        textView.font = Font.MKFont(13.0)
+        let textView = UITextView(frame: CGRect(x: 10.0, y: 3 * 5.0 + MKFont.font(13.0).lineHeight, width: MKScreen.width - 30.0 - 2 * 10.0 , height: textBackViewHeight - 55.0 - MKFont.font(13.0).lineHeight))
+        textView.font = MKFont.font(13.0)
         textView.layoutManager.allowsNonContiguousLayout = false
         textView.isEditable = false
-        textView.textColor = Color.defaultText
+        textView.textColor = MKColor.defaultText
         return textView
     }()
     
     private lazy var curveView: MKSFBXSExportHTDataCurveView = {
-        let view = MKSFBXSExportHTDataCurveView(frame: CGRect(x:Screen.width - 10.0, y: htTextViewOffset_Y, width: Screen.width - 30.0, height: textBackViewHeight))
+        let view = MKSFBXSExportHTDataCurveView(frame: CGRect(x:MKScreen.width - 10.0, y: htTextViewOffset_Y, width: MKScreen.width - 30.0, height: textBackViewHeight))
         return view
     }()
     
     private lazy var textBackView: UIView = {
-        let view = UIView(frame: CGRect(x: 10.0, y: htTextViewOffset_Y, width: Screen.width - 30.0, height: textBackViewHeight))
+        let view = UIView(frame: CGRect(x: 10.0, y: htTextViewOffset_Y, width: MKScreen.width - 30.0, height: textBackViewHeight))
         view.layer.masksToBounds = true
         view.layer.borderWidth = 0.5
         view.layer.cornerRadius = 2.0
-        view.layer.borderColor = Color.rgb(227, 227, 227).cgColor
+        view.layer.borderColor = MKColor.rgb(227, 227, 227).cgColor
         
         let timeLabel = loadTextLabel("Time")
         let tempLabel = loadTextLabel("Temperature")
@@ -178,9 +181,9 @@ class MKSFBXSFilterHTHistoryDataController: MKSwiftBaseViewController {
         view.addSubview(tempLabel)
         view.addSubview(humidityLabel)
         
-        timeLabel.frame = CGRect(x: textViewSpace, y: 5.0, width: timeTextViewWidth, height: Font.MKFont(13.0).lineHeight)
-        tempLabel.frame = CGRect(x: 2 * textViewSpace + timeTextViewWidth, y: 5.0, width: htTextViewWidth, height: Font.MKFont(13.0).lineHeight)
-        humidityLabel.frame = CGRect(x: 3 * textViewSpace + timeTextViewWidth + htTextViewWidth, y: 5.0, width: htTextViewWidth, height: Font.MKFont(13.0).lineHeight)
+        timeLabel.frame = CGRect(x: textViewSpace, y: 5.0, width: timeTextViewWidth, height: MKFont.font(13.0).lineHeight)
+        tempLabel.frame = CGRect(x: 2 * textViewSpace + timeTextViewWidth, y: 5.0, width: htTextViewWidth, height: MKFont.font(13.0).lineHeight)
+        humidityLabel.frame = CGRect(x: 3 * textViewSpace + timeTextViewWidth + htTextViewWidth, y: 5.0, width: htTextViewWidth, height: MKFont.font(13.0).lineHeight)
         
         return view
     }()
@@ -195,8 +198,8 @@ class MKSFBXSFilterHTHistoryDataController: MKSwiftBaseViewController {
     
     private func loadTextLabel(_ text: String) -> UILabel {
         let label = UILabel()
-        label.textColor = Color.defaultText
-        label.font = Font.MKFont(13.0)
+        label.textColor = MKColor.defaultText
+        label.font = MKFont.font(13.0)
         label.textAlignment = .center
         label.text = text
         return label
@@ -225,8 +228,8 @@ extension MKSFBXSFilterHTHistoryDataController: @preconcurrency MKSFBXSFilterHTH
     func bxs_swf_filterHTHistoryHeaderView_switchButtonPressed(_ selected: Bool) {
         if selected {
             UIView.animate(withDuration: 0.3) {
-                self.textBackView.frame = CGRect(x: -(Screen.width - 10.0), y: self.htTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
-                self.curveView.frame = CGRect(x: 10.0, y: self.htTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
+                self.textBackView.frame = CGRect(x: -(MKScreen.width - 10.0), y: self.htTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
+                self.curveView.frame = CGRect(x: 10.0, y: self.htTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
             } completion: { _ in
                 self.drawHTCurveView()
             }
@@ -234,8 +237,8 @@ extension MKSFBXSFilterHTHistoryDataController: @preconcurrency MKSFBXSFilterHTH
         }
         
         UIView.animate(withDuration: 0.3) {
-            self.textBackView.frame = CGRect(x: 10.0, y: self.htTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
-            self.curveView.frame = CGRect(x: Screen.width - 10.0, y: self.htTextViewOffset_Y, width: Screen.width - 30.0, height: self.textBackViewHeight)
+            self.textBackView.frame = CGRect(x: 10.0, y: self.htTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
+            self.curveView.frame = CGRect(x: MKScreen.width - 10.0, y: self.htTextViewOffset_Y, width: MKScreen.width - 30.0, height: self.textBackViewHeight)
         }
     }
     

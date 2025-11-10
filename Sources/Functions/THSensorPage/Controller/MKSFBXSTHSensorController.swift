@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSTHSensorController: MKSwiftBaseViewController {
     
@@ -154,10 +157,10 @@ class MKSFBXSTHSensorController: MKSwiftBaseViewController {
     // MARK: - UI
     
     private func setupUI() {
-        titleLabel.font = Font.MKFont(15.0)
+        titleLabel.font = MKFont.font(15.0)
         defaultTitle = "Temperature & Humidity"
         rightButton.setImage(moduleIcon(name: "bxs_swf_slotSaveIcon", in: .module), for: .normal)
-        view.backgroundColor = Color.rgb(242, 242, 242)
+        view.backgroundColor = MKColor.rgb(242, 242, 242)
         
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
@@ -172,7 +175,7 @@ class MKSFBXSTHSensorController: MKSwiftBaseViewController {
     
     private lazy var tableView: MKSwiftBaseTableView = {
         let tableView = MKSwiftBaseTableView(frame: .zero, style: .plain)
-        tableView.backgroundColor = Color.rgb(242, 242, 242)
+        tableView.backgroundColor = MKColor.rgb(242, 242, 242)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableHeaderView = headerView
@@ -180,7 +183,7 @@ class MKSFBXSTHSensorController: MKSwiftBaseViewController {
     }()
     private lazy var headerViewModel = MKSFBXSTHSensorHeaderViewModel()
     private lazy var headerView: MKSFBXSTHSensorHeaderView = {
-        let headerView = MKSFBXSTHSensorHeaderView(frame: CGRect(x: 0, y: 0, width: Screen.width, height: 200))
+        let headerView = MKSFBXSTHSensorHeaderView(frame: CGRect(x: 0, y: 0, width: MKScreen.width, height: 200))
         headerView.delegate = self
         return headerView
     }()

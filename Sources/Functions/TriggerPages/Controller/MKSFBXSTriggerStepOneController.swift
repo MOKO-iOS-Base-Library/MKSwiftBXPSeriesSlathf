@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
     
@@ -176,7 +179,7 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
         cellModel.msg = "Trigger type"
         cellModel.dataList = MKSFBXSTriggerParamManager.shared.stepOneModel.fetchTriggerTypeList()
         cellModel.dataListIndex = MKSFBXSTriggerParamManager.shared.stepOneModel.triggerIndex
-        cellModel.buttonLabelFont = Font.MKFont(12.0)
+        cellModel.buttonLabelFont = MKFont.font(12.0)
         section1List.append(cellModel)
     }
     
@@ -186,14 +189,14 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
         cellModel.msg = "Trigger event"
         cellModel.dataList = loadTriggerEventList()
         cellModel.dataListIndex = loadTriggerEventIndex()
-        cellModel.buttonLabelFont = Font.MKFont(12.0)
+        cellModel.buttonLabelFont = MKFont.font(12.0)
         section2List.append(cellModel)
     }
     
     private func loadSection3Datas() {
         let cellModel = MKSwiftNormalSliderCellModel()
         cellModel.index = 0
-        cellModel.msg = MKSwiftUIAdaptor.createAttributedString(strings: ["Temperature threshold", "   (-40℃~150℃)"], fonts: [Font.MKFont(13.0),Font.MKFont(12.0)], colors: [Color.defaultText,Color.rgb(223, 223, 223)])
+        cellModel.msg = MKSwiftUIAdaptor.createAttributedString(strings: ["Temperature threshold", "   (-40℃~150℃)"], fonts: [MKFont.font(13.0),MKFont.font(12.0)], colors: [MKColor.defaultText,MKColor.rgb(223, 223, 223)])
         cellModel.sliderMinValue = -40
         cellModel.sliderMaxValue = 150
         cellModel.unit = "℃"
@@ -204,7 +207,7 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
     private func loadSection4Datas() {
         let cellModel = MKSwiftNormalSliderCellModel()
         cellModel.index = 1
-        cellModel.msg = MKSwiftUIAdaptor.createAttributedString(strings: ["Humidity threshold", "   (0%~95%)"], fonts: [Font.MKFont(13.0),Font.MKFont(12.0)], colors: [Color.defaultText,Color.rgb(223, 223, 223)])
+        cellModel.msg = MKSwiftUIAdaptor.createAttributedString(strings: ["Humidity threshold", "   (0%~95%)"], fonts: [MKFont.font(13.0),MKFont.font(12.0)], colors: [MKColor.defaultText,MKColor.rgb(223, 223, 223)])
         cellModel.sliderMinValue = 0
         cellModel.sliderMaxValue = 95
         cellModel.unit = "%"
@@ -222,7 +225,7 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
         cellModel.maxLength = 5
         cellModel.textFieldValue = MKSFBXSTriggerParamManager.shared.stepOneModel.motionVerificationPeriod
         cellModel.noteMsg = "*Static verify period: the parameter that determines when a stationary event occurs on the device."
-        cellModel.noteMsgColor = Color.rgb(201, 90, 49)
+        cellModel.noteMsgColor = MKColor.rgb(201, 90, 49)
         section5List.append(cellModel)
     }
     
@@ -234,7 +237,7 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
         if MKSFBXSTriggerParamManager.shared.stepOneModel.lockedAdvIsOn {
             cellModel.noteMsg = "*Lock Event Occurs ADV Duration: If the device quickly returns to a state where the triggering condition is no longer met after initially satisfying the triggering condition, it can only broadcast for a short duration, or might not broadcast at all. The Locked ADV function ensures that, in such cases, the set post-trigger broadcast duration is fully executed, regardless of changes in the triggering condition.\n\n Note: If the Event Occurs Total adv duration is set to 0, the Lock post -trigger adv duration will default to a locked broadcast of 5 seconds."
         }
-        cellModel.noteMsgColor = Color.rgb(201, 90, 49)
+        cellModel.noteMsgColor = MKColor.rgb(201, 90, 49)
         section6List.append(cellModel)
     }
     
@@ -247,7 +250,7 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
         cellModel.unit = "s"
         cellModel.maxLength = 5
         cellModel.noteMsg = "*Lock ADV duration: If the device quickly returns to a state that does not meet the trigger conditions after initially satisfying them, it may only broadcast for a short period. The lock broadcast duration feature ensures that, in such cases, the device broadcasts for the set lock broadcast duration. This feature's parameter must be set to a value less than the post-trigger broadcast duration."
-        cellModel.noteMsgColor = Color.rgb(201, 90, 49)
+        cellModel.noteMsgColor = MKColor.rgb(201, 90, 49)
         section7List.append(cellModel)
     }
     
@@ -267,7 +270,7 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
     
     private lazy var tableView: MKSwiftBaseTableView = {
         let tableView = MKSwiftBaseTableView(frame: .zero, style: .plain)
-        tableView.backgroundColor = Color.rgb(242, 242, 242)
+        tableView.backgroundColor = MKColor.rgb(242, 242, 242)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableHeaderView = tableHeaderView
@@ -282,18 +285,18 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
     }()
     
     private lazy var tableHeaderView: UIView = {
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: Screen.width, height: 110))
-        headerView.backgroundColor = Color.rgb(242, 242, 242)
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: MKScreen.width, height: 110))
+        headerView.backgroundColor = MKColor.rgb(242, 242, 242)
         
-        let stepLabel = UILabel(frame: CGRect(x: 15, y: 10, width: Screen.width - 30, height: 20))
+        let stepLabel = UILabel(frame: CGRect(x: 15, y: 10, width: MKScreen.width - 30, height: 20))
         stepLabel.textAlignment = .left
-        stepLabel.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["1", "/3", ":", "Initial Setting"], fonts: [Font.MKFont(15.0),Font.MKFont(13.0),Font.MKFont(13.0),Font.MKFont(18.0)], colors: [Color.navBar,Color.rgb(137, 137, 137),Color.navBar,Color.defaultText])
+        stepLabel.attributedText = MKSwiftUIAdaptor.createAttributedString(strings: ["1", "/3", ":", "Initial Setting"], fonts: [MKFont.font(15.0),MKFont.font(13.0),MKFont.font(13.0),MKFont.font(18.0)], colors: [MKColor.navBar,MKColor.rgb(137, 137, 137),MKColor.navBar,MKColor.defaultText])
         headerView.addSubview(stepLabel)
         
-        let noteMsgLabel = UILabel(frame: CGRect(x: 15, y: 40, width: Screen.width - 30, height: 65))
+        let noteMsgLabel = UILabel(frame: CGRect(x: 15, y: 40, width: MKScreen.width - 30, height: 65))
         noteMsgLabel.textAlignment = .left
-        noteMsgLabel.textColor = Color.rgb(204, 102, 72)
-        noteMsgLabel.font = Font.MKFont(13.0)
+        noteMsgLabel.textColor = MKColor.rgb(204, 102, 72)
+        noteMsgLabel.font = MKFont.font(13.0)
         noteMsgLabel.numberOfLines = 0
         noteMsgLabel.text = "*In this step1, you can enable or disable the trigger feature, You can also configure the trigger type and define the event criteria that meet the trigger conditions (Trigger event)."
         headerView.addSubview(noteMsgLabel)
@@ -302,8 +305,8 @@ class MKSFBXSTriggerStepOneController: MKSwiftBaseViewController {
     }()
     
     private lazy var tableFooterView: UIView = {
-        let footerView = UIView(frame: CGRect(x: 0, y: 0, width: Screen.width, height: 80))
-        footerView.backgroundColor = Color.rgb(242, 242, 242)
+        let footerView = UIView(frame: CGRect(x: 0, y: 0, width: MKScreen.width, height: 80))
+        footerView.backgroundColor = MKColor.rgb(242, 242, 242)
         
         footerView.addSubview(nextButton)
         nextButton.snp.makeConstraints { make in
@@ -325,19 +328,19 @@ extension MKSFBXSTriggerStepOneController: UITableViewDelegate, UITableViewDataS
         switch indexPath.section {
         case 3://Temperature threshold
             let cellModel = section3List[indexPath.row]
-            return cellModel.cellHeightWithContentWidth(Screen.width)
+            return cellModel.cellHeightWithContentWidth(MKScreen.width)
         case 4://Humidity threshold
             let cellModel = section4List[indexPath.row]
-            return cellModel.cellHeightWithContentWidth(Screen.width)
+            return cellModel.cellHeightWithContentWidth(MKScreen.width)
         case 5://Static verify period
             let cellModel = section5List[indexPath.row]
-            return cellModel.cellHeightWithContentWidth(Screen.width)
+            return cellModel.cellHeightWithContentWidth(MKScreen.width)
         case 6://Lock Event Occurs ADV Duration
             let cellModel = section6List[indexPath.row]
-            return cellModel.cellHeightWithContentWidth(Screen.width)
+            return cellModel.cellHeightWithContentWidth(MKScreen.width)
         case 7://Locked ADV duration
             let cellModel = section7List[indexPath.row]
-            return cellModel.cellHeightWithContentWidth(Screen.width)
+            return cellModel.cellHeightWithContentWidth(MKScreen.width)
         default:
             return 44
         }

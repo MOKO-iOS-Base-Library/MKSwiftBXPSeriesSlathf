@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 protocol MKSFBXSExportDataHeaderViewDelegate: AnyObject {
     func mk_bxs_swf_syncButtonPressed(_ selected: Bool)
@@ -196,9 +199,9 @@ class MKSFBXSExportDataHeaderView: UIView {
     
     private lazy var syncLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(10.0)
+        label.font = MKFont.font(10.0)
         label.text = "Sync"
         return label
     }()
@@ -213,9 +216,9 @@ class MKSFBXSExportDataHeaderView: UIView {
     
     private lazy var switchLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(10.0)
+        label.font = MKFont.font(10.0)
         label.text = "Display"
         return label
     }()
@@ -230,9 +233,9 @@ class MKSFBXSExportDataHeaderView: UIView {
     
     private lazy var deleteLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(10.0)
+        label.font = MKFont.font(10.0)
         label.text = "Erase all"
         return label
     }()
@@ -247,9 +250,9 @@ class MKSFBXSExportDataHeaderView: UIView {
     
     private lazy var exportLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .center
-        label.font = Font.MKFont(10.0)
+        label.font = MKFont.font(10.0)
         label.text = "Export"
         return label
     }()

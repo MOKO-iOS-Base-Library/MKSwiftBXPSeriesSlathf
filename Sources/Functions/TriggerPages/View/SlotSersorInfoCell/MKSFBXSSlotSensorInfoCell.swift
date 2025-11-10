@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 // MARK: - Models and Protocols
 
@@ -155,7 +158,7 @@ class MKSFBXSSlotSensorInfoCell: MKSwiftBaseCell {
     }()
     
     private lazy var deviceNameLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(13.0), text: "Device name")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(13.0), text: "Device name")
     }()
     
     private lazy var nameTextField: MKSwiftTextField = {
@@ -168,14 +171,14 @@ class MKSFBXSSlotSensorInfoCell: MKSwiftBaseCell {
     }()
     
     private lazy var tagIDLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(13.0), text: "Tag ID")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(13.0), text: "Tag ID")
     }()
     
     private lazy var xLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Color.defaultText
+        label.textColor = MKColor.defaultText
         label.textAlignment = .right
-        label.font = Font.MKFont(11.0)
+        label.font = MKFont.font(11.0)
         label.text = "0x"
         return label
     }()

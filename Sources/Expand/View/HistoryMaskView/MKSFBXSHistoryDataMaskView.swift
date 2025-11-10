@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSHistoryDataMaskView: UIView {
     
@@ -16,7 +19,7 @@ class MKSFBXSHistoryDataMaskView: UIView {
     override init(frame: CGRect) {
         let screenBounds = UIScreen.main.bounds
         super.init(frame: screenBounds)
-        backgroundColor = Color.rgb(0, 0, 0, 0.5)
+        backgroundColor = MKColor.rgb(0, 0, 0, 0.5)
         setupUI()
     }
     
@@ -75,7 +78,7 @@ class MKSFBXSHistoryDataMaskView: UIView {
             make.left.equalToSuperview().offset(10)
             make.right.equalToSuperview().offset(-10)
             make.top.equalToSuperview().offset(10)
-            make.height.equalTo(Font.MKFont(15.0).lineHeight)
+            make.height.equalTo(MKFont.font(15.0).lineHeight)
         })
         // Calculate dynamic height for numberLabel
         let width = frame.size.width - 2 * 30 - 2 * 10
@@ -93,9 +96,9 @@ class MKSFBXSHistoryDataMaskView: UIView {
     
     private lazy var backView: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.rgb(44, 44, 44)
+        view.backgroundColor = MKColor.rgb(44, 44, 44)
         view.layer.masksToBounds = true
-        view.layer.borderColor = Line.color.cgColor
+        view.layer.borderColor = MKLine.color.cgColor
         view.layer.borderWidth = 0.5
         view.layer.cornerRadius = 5.0
         return view
@@ -104,7 +107,7 @@ class MKSFBXSHistoryDataMaskView: UIView {
     private lazy var totalLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
-        label.font = Font.MKFont(15.0)
+        label.font = MKFont.font(15.0)
         label.textAlignment = .center
         return label
     }()
@@ -112,7 +115,7 @@ class MKSFBXSHistoryDataMaskView: UIView {
     private lazy var numberLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
-        label.font = Font.MKFont(15.0)
+        label.font = MKFont.font(15.0)
         label.textAlignment = .center
         label.numberOfLines = 0
         label.text = "Reading data ... , update 0 records"

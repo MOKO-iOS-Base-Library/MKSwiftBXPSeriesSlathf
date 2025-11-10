@@ -6,9 +6,12 @@
 //
 
 import UIKit
+
 import SnapKit
-import MKBaseSwiftModule
 import DateTimePicker
+
+import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 protocol MKSFBXSFilterHistoryDataViewDelegate: AnyObject {
     func bxs_swf_dateSelectedView(startPressed startDate: String, endDate: String)
@@ -154,16 +157,16 @@ class MKSFBXSFilterHistoryDataView: UIView {
     
     private lazy var topLine: UIView = {
         let view = UIView()
-        view.backgroundColor = Color.defaultText
+        view.backgroundColor = MKColor.defaultText
         return view
     }()
     
     private lazy var startLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(13.0), text: "Start Date:")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(13.0), text: "Start Date:")
     }()
     
     private lazy var startDateLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(11.0))
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(11.0))
     }()
     
     private lazy var startDateButton: UIButton = {
@@ -175,11 +178,11 @@ class MKSFBXSFilterHistoryDataView: UIView {
     }()
     
     private lazy var endLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(13.0), text: "End Date:")
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(13.0), text: "End Date:")
     }()
     
     private lazy var endDateLabel: UILabel = {
-        return MKSwiftUIAdaptor.createNormalLabel(font: Font.MKFont(11.0))
+        return MKSwiftUIAdaptor.createNormalLabel(font: MKFont.font(11.0))
     }()
     
     private lazy var endDateButton: UIButton = {
@@ -192,7 +195,7 @@ class MKSFBXSFilterHistoryDataView: UIView {
     
     private lazy var startButton: UIButton = {
         let button = MKSwiftUIAdaptor.createRoundedButton(title: "Start", target: self, action: #selector(startButtonPressed))
-        button.titleLabel?.font = Font.MKFont(12.0)
+        button.titleLabel?.font = MKFont.font(12.0)
         return button
     }()
     

@@ -6,8 +6,11 @@
 //
 
 import UIKit
+
 import SnapKit
+
 import MKBaseSwiftModule
+import MKSwiftCustomUI
 
 class MKSFBXSExportHTDataCurveView: UIView {
     
@@ -64,14 +67,14 @@ class MKSFBXSExportHTDataCurveView: UIView {
             make.left.equalTo(10.0)
             make.right.equalTo(-10.0)
             make.top.equalTo(5.0)
-            make.height.equalTo(Font.MKFont(10.0).lineHeight)
+            make.height.equalTo(MKFont.font(10.0).lineHeight)
         }
         
         displayLabel.snp.remakeConstraints { make in
             make.left.equalTo(10.0)
             make.right.equalTo(-10.0)
             make.top.equalTo(totalLabel.snp.bottom).offset(3.0)
-            make.height.equalTo(Font.MKFont(10.0).lineHeight)
+            make.height.equalTo(MKFont.font(10.0).lineHeight)
         }
         
         tempView.snp.remakeConstraints { make in
@@ -102,7 +105,7 @@ class MKSFBXSExportHTDataCurveView: UIView {
         let label = UILabel()
         label.textColor = .blue
         label.textAlignment = .right
-        label.font = Font.MKFont(10.0)
+        label.font = MKFont.font(10.0)
         label.text = "Total Data Points: 0"
         return label
     }()
@@ -111,7 +114,7 @@ class MKSFBXSExportHTDataCurveView: UIView {
         let label = UILabel()
         label.textColor = .blue
         label.textAlignment = .right
-        label.font = Font.MKFont(10.0)
+        label.font = MKFont.font(10.0)
         label.text = "Window Display Points: 0"
         return label
     }()
@@ -129,7 +132,7 @@ class MKSFBXSExportHTDataCurveView: UIView {
         model.curveTitle = "Temperature(℃)"
         model.curveViewBackgroundColor = .white
         model.lineWidth = 3.0
-        model.labelColor = Color.rgb(136, 136, 136)
+        model.labelColor = MKColor.rgb(136, 136, 136)
         return model
     }()
     
@@ -139,7 +142,7 @@ class MKSFBXSExportHTDataCurveView: UIView {
         model.curveViewBackgroundColor = .white
         model.lineWidth = 3.0
         model.curveTitle = "Humidity(%RH)"
-        model.labelColor = Color.rgb(136, 136, 136)
+        model.labelColor = MKColor.rgb(136, 136, 136)
         return model
     }()
 }

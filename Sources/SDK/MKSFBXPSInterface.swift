@@ -413,11 +413,11 @@ import CoreBluetooth
             cmdFlag: "53"
         )
         
-        guard let state = result.value["state"] as? String else {
+        guard let state = result.value["state"] as? UInt8 else {
             throw MKSwiftBleError.paramsError
         }
         
-        return (state == "01")
+        return (state == 0x01)
     }
     
     // MARK: - AA08 Hall Sensor Data
