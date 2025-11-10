@@ -7,7 +7,7 @@ let package = Package(
     products: [
         .library(
             name: "MKSwiftBXPSeriesSlathf",
-            type: .dynamic,
+            // 移除 type: .dynamic 或改为 .static
             targets: ["MKSwiftBXPSeriesSlathf"]
         ),
     ],
@@ -34,13 +34,6 @@ let package = Package(
             resources: [.process("Assets")],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),
-                .define("IOS15_OR_LATER"),
-            ],
-            linkerSettings: [
-                .linkedLibrary("z"),
-                .linkedLibrary("iconv"),
-                .linkedFramework("Foundation"),
-                .linkedFramework("UIKit")
             ]
         ),
         .testTarget(
